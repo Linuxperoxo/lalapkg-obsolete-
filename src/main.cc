@@ -8,6 +8,7 @@
 #include <libconfig.h++>
 //==========================================================| MY_LIBS
 #include "check.h"
+#include "package.h"
 //==========================================================| MACROS
 #define RED "\033[031m"
 #define GREEN "\033[032m"
