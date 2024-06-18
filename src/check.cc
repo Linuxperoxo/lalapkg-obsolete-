@@ -7,5 +7,5 @@ bool check_file(const std::string& file){
 }
 
 bool check_dir(const std::string& dir){
-  return std::filesystem::exists(dir) && std::filesystem::is_regular_file(dir);
+  return std::filesystem::exists(dir) && std::filesystem::is_directory(dir);
 }
