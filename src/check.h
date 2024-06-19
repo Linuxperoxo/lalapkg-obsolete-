@@ -1,8 +1,8 @@
- //=========================================|
-//|   FILE: check.h                         |
-//|   AUTHOR: Linuxperoxo                   |
-//|   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
-//|=========================================/
+//=========================================|
+//   FILE: check.h                         |
+//   AUTHOR: Linuxperoxo                   |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
+//=========================================/
 
 
 #ifndef CHECK_H
