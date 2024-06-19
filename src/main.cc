@@ -172,6 +172,10 @@ char parse_arguments(char* arg[], int& num_args){
   return user_arg;
 }
 
+void emerge(std::string pkg){
+  package_exist(repo_dir, pkg, build_file);
+}
+
 //==========================================================| MAIN
 
 int main(int argc, char* argv[]){
@@ -193,13 +197,12 @@ int main(int argc, char* argv[]){
   switch(arg){
     case 'e':
       for(const auto& vector : packages_vector){
-        std::cout << "Emerge: " << vector << std::endl;
-      }  
+        emerge(vector);
+      }
     break;
 
     case 'u':
       for(const auto& vector : packages_vector){
-        std::cout << "Unmerge: " << vector << std::endl;
       }
     break;
   }
