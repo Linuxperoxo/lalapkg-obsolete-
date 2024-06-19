@@ -1,3 +1,9 @@
+ //=========================================|
+//|   FILE: package_operations.cc           |
+//|   AUTHOR: Linuxperoxo                   |
+//|   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
+//|=========================================/
+
 #include <cstdlib>
 #include <string>
 #include <iostream>

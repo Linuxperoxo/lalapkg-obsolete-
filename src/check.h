@@ -1,3 +1,10 @@
+ //=========================================|
+//|   FILE: check.h                         |
+//|   AUTHOR: Linuxperoxo                   |
+//|   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
+//|=========================================/
+
+
 #ifndef CHECK_H
 #define CHECK_H
 

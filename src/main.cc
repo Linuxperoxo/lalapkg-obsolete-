@@ -1,3 +1,38 @@
+/*
+
+|=========================================|
+|   FILE: main.cc                         |
+|   AUTHOR: Linuxperoxo                   |
+|   VERSION: 1.1a                         |
+|   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
+|=========================================|
+
+|=====================================================================|
+|DESCRIÇÂO:                                                           |
+|   Um gerenciador de pacotes simples, focado no minimalismo e na     |
+| simplicidade.                                                       |
+|                                                                     |
+|OBS:                                                                 |
+|   Este pequeno projeto foi desenvolvido por pura diversão e como    | 
+| uma forma de praticar minha lógica de programação, visando          |
+| aprimorar gradualmente minhas habilidades neste fascinante mundo    |
+| da programação.                                                     |
+|=====================================================================|
+
+|=====================================================================|
+| CHANGE LOG |                                                        |
+|-------------                                                        |
+|                                                                     |
+|1.1a:                                                                |
+| * Melhorias no código;                                              |
+| * Agora a base dos argumentos principais foram adicionados;         |
+| * Novo .h "package operations.h";                                   |
+| * Adicionado suporte a instalação enfileirada de pacotes;           |
+|=====================================================================|
+ 
+
+*/
+
 //==========================================================| LIBS
 
 #include <chrono>
@@ -11,7 +46,7 @@
 #include <libconfig.h++>
 #include <filesystem>
 
-//==========================================================| MY HEARDERS
+//==========================================================| MY HEADERS
 
 #include "check.h"
 #include "package_operations.h"

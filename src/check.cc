@@ -1,3 +1,9 @@
+ //=========================================|
+//   FILE: check.cc                         |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #include <string>
 #include <filesystem>
 

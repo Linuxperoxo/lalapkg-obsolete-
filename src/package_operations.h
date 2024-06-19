@@ -1,3 +1,9 @@
+ //=========================================|
+//|   FILE: package_operations.h            |
+//|   AUTHOR: Linuxperoxo                   |
+//|   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
+//|=========================================/
+
 #ifndef PACKAGE_OPERATIONS_H
 #define PACKAGE_OPERATIONS_H
 
