@@ -33,7 +33,7 @@ const std::string world_dir = "/var/lalapkg/world/";
 
 std::vector<std::string> packages_vector;
 
-//==========================================================| CONFIG_FILE STRUCT 
+//==========================================================| CONFIG_FILE STRUCT
 
 struct Config_file{
   std::string sync;
@@ -51,19 +51,19 @@ Config_file conf_file;
 
 int load_config(const std::string& file){
   libconfig::Config conf_obj;
-  
+
   try{
     conf_obj.readFile(file);
-    
+
     const std::string var_names[] = {"sync", "source_dir", "root_dir", "installbin_dir", "custom_repo", "common_flags", "jobs"};
     std::string* var_pts[] = {&conf_file.sync, &conf_file.source_dir, &conf_file.root_dir, &conf_file.installbin_dir, &conf_file.custom_repo, &conf_file.common_flags, &conf_file.jobs};
-    
+
     const size_t size = sizeof(var_pts) / sizeof(var_pts[0]);
 
     bool ERROR = false;
 
     std::cout << GREEN << "|==========VAR-RESULTS=========|" << NC << std::endl;
-    
+
     for(int i = 0; i < size; i++){
       conf_obj.lookupValue(var_names[i], *var_pts[i]);
       if(var_pts[i]->empty()){
@@ -109,16 +109,16 @@ int check_dirs(const std::string* dirs[], const std::string& warning_dir, const 
         std::cerr << YELLOW << "WARNING: " << NC << "repository directory -> " << GREEN << *dirs[i] << NC << " does not exist, use" << GREEN << " lalapkg --sync" << NC << std::endl;
       } else {
         std::cerr << YELLOW << "WARNING: " << NC << "Directory -> " << GREEN << *dirs[i] << NC << " not found" << std::endl;
-        
+
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        
+
         try{
           std::filesystem::create_directories(*dirs[i]);
           std::cout << ">>> Created Directory -> " << GREEN << *dirs[i] << NC << std::endl;
         }
 
         catch(std::filesystem::filesystem_error &error){
-          std::cerr << RED << "ERROR: " << NC << "Failed to create directory -> " << GREEN << *dirs[i] << ": " << NC << error.what() << std::endl; 
+          std::cerr << RED << "ERROR: " << NC << "Failed to create directory -> " << GREEN << *dirs[i] << ": " << NC << error.what() << std::endl;
           return EXIT_FAILURE;
         }
       }
@@ -127,29 +127,40 @@ int check_dirs(const std::string* dirs[], const std::string& warning_dir, const 
   return EXIT_SUCCESS;
 }
 
-void put_package_in_vector(std::string& package){ 
+void put_package_in_vector(std::string& package){
   packages_vector.insert(packages_vector.begin() + packages_vector.size(), package);
 }
 
 char parse_arguments(char* arg[], int& num_args){
   char user_arg = 'n';
   int index = 1;
-  
+
   for(int i = 0; i < num_args; i++){
     switch(arg[i][1]){
-      case 'e': 
+      case 'e':
         user_arg = 'e';
         index += i;
-        
+
         while(arg[index] != nullptr){
           std::string package(arg[index]);
+
           put_package_in_vector(package);
+
           index++;
         }
       break;
 
       case 'u':
         user_arg = 'u';
+        index += i;
+
+        while(arg[index] != nullptr){
+          std::string package(arg[index]);
+
+          put_package_in_vector(package);
+
+          index++;
+        }
       break;
     }
 
@@ -163,7 +174,7 @@ char parse_arguments(char* arg[], int& num_args){
 //==========================================================| MAIN
 
 int main(int argc, char* argv[]){
-  const std::string* check_this_dirs[] = {&conf_file.source_dir, &conf_file.root_dir, &conf_file.installbin_dir, &conf_file.custom_repo, &repo_dir, &world_dir}; 
+  const std::string* check_this_dirs[] = {&conf_file.source_dir, &conf_file.root_dir, &conf_file.installbin_dir, &conf_file.custom_repo, &repo_dir, &world_dir};
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
 
   if(load_config(config_file) == EXIT_FAILURE){
@@ -176,17 +187,18 @@ int main(int argc, char* argv[]){
 
   const char arg = parse_arguments(argv, argc);
 
+//==========================================================| MAIN SWITCH
+
   switch(arg){
     case 'e':
-      std::cout << "Instalar esses pacotes: " << std::endl;
-      for(int i = 0; i < packages_vector.size(); i++){
-        std::cout << packages_vector[i] << std::endl;
-      }
+
     break;
 
     case 'u':
+
     break;
   }
 
+//==========================================================| END MAIN SWITCH
   return 0;
 }
