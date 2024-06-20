@@ -1,5 +1,3 @@
-# lalapkg
------------------------------------------------------------------------------
 # CHANGE LOG:                                                        
 
   1.1.1a:                                                              
@@ -17,8 +15,6 @@
    * Classe para pacotes foi adicionado para melhor organização e      
      Manipulação do pacote;                                            
    * Nova função adicionada em package_operations;                     
-
--------------------------------------------------------------------------------
 
  # TO DOS:                                                            
                                                             
