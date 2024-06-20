@@ -9,6 +9,7 @@
 
 #include <string>
 
-std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name);
+std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name);
+int get_infos(const std::string* vars_ptr[]);
 
 #endif 

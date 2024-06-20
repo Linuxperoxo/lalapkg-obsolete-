@@ -2,34 +2,55 @@
 
 /==========================================|
 |   FILE: main.cc                          |
-|   VERSION: 1.1a                          |
+|   VERSION: 1.1.2a                        |
 |   AUTHOR: Linuxperoxo                    |
 |   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 |==========================================/
 
 |=====================================================================|
-|DESCRIÇÂO:                                                           |
+| DESCRIÇÂO |                                                         |
+|------------                                                         |
+|                                                                     |
 |   Um gerenciador de pacotes simples, focado no minimalismo e na     |
 | simplicidade.                                                       |
 |                                                                     |
-|OBS:                                                                 |
+| OBS:                                                                |
 |   Este pequeno projeto foi desenvolvido por pura diversão e como    | 
 | uma forma de praticar minha lógica de programação, visando          |
-| aprimorar gradualmente minhas habilidades neste fascinante mundo    |
-| da programação.                                                     |
+| aprimorar gradualmente minhas habilidades na linguagem C++          |
 |=====================================================================|
 
 |=====================================================================|
 | CHANGE LOG |                                                        |
 |-------------                                                        |
 |                                                                     |
-|1.1a:                                                                |
+|1.1.1a:                                                              |
 | * Melhorias no código;                                              |
 | * Agora a base dos argumentos principais foram adicionados;         |
-| * Novo .h "package operations.h";                                   |
+| * Novo .h "package_operations.h";                                   |
 | * Adicionado suporte a instalação enfileirada de pacotes;           |
+|                                                                     |
+|1.1.2a:                                                              |
+| * Correção de bugs;                                                 |
+| * Novo .h "package.h";                                              |
+| * Os argumentos foram removidos no momento;                         |
+| * Novo arquivo no repositorio "Pkg-infos";                          |
+| * Função package_exist foi adaptada;                                |
+| * Classe para pacotes foi adicionado para melhor organização e      |
+|   Manipulação do pacote;                                            |
+| * Nova função adicionada em package_operations;                     |
 |=====================================================================|
- 
+
+|=====================================================================|
+| TO DOS |                                                            |
+|---------                                                            |
+| * Refazer toda função parse_arguments;                              |
+| * Fazer função get_infos em package_operations;                     |
+| * Adicionar funções na classe Package para manipulação do pacote;   |
+| * Primeiros pacotes serão adicionados ao repositorio para testar    |
+|   Funções básicas do gerenciador;                                   |
+|=====================================================================| 
+
 
 */
 
@@ -50,6 +71,7 @@
 
 #include "check.h"
 #include "package_operations.h"
+#include "package.h"
 
 //==========================================================| MACROS
 
@@ -62,6 +84,7 @@
 
 const std::string config_file = "/etc/lala.conf";
 const std::string repo_dir = "/var/lalapkg/repo";
+const std::string info_file = "Pkg-infos";
 const std::string build_file = "Buildpkg";
 const std::string world_dir = "/var/lalapkg/world/";
 
@@ -167,48 +190,19 @@ void put_package_in_vector(std::string& package){
   packages_vector.push_back(package);
 }
 
-char parse_arguments(char* arg[], int& num_args){
-  char user_arg = 'n';
-  int index = 1;
-  
-  for(int i = 0; i < num_args; i++){
-    switch(arg[i][1]){
-      case 'e': 
-        user_arg = 'e';
-        index += i;
-        
-        while(arg[index] != nullptr){
-          std::string package(arg[index]);
-          
-          put_package_in_vector(package);
-          
-          index++;
-        }
-      break;
-
-      case 'u':
-        user_arg = 'u';
-        index += i;
-
-        while(arg[index] != nullptr){
-          std::string package(arg[index]);
-          
-          put_package_in_vector(package);
-          
-          index++;
-        }
-      break;
-    }
-
-    if(user_arg != 'n'){
-      break;
-    }
-  }
-  return user_arg;
+void parse_arguments(char* arg[], int& num_args){
 }
 
-void emerge(std::string pkg){
-  package_exist(repo_dir, pkg, build_file);
+int emerge(std::string pkg){
+  const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
+
+  if(pkgroot == ""){
+    return EXIT_FAILURE;
+  }
+  
+  Package newpkg(pkgroot + info_file, pkgroot + build_file);
+
+  return EXIT_SUCCESS;
 }
 
 //==========================================================| MAIN
@@ -225,11 +219,11 @@ int main(int argc, char* argv[]){
     return EXIT_FAILURE;
   }
 
-  const char arg = parse_arguments(argv, argc);
+  //const char arg = parse_arguments(argv, argc);
 
 //==========================================================| MAIN SWITCH
   
-  switch(arg){
+  switch('e'){
     case 'e':
       for(const auto& vector : packages_vector){
         emerge(vector);
@@ -239,6 +233,10 @@ int main(int argc, char* argv[]){
     case 'u':
       for(const auto& vector : packages_vector){
       }
+    break;
+
+    default:
+      std::cerr << RED << "ERROR: " << NC << "U must pass an valid argument!" << std::endl;
     break;
   }
 

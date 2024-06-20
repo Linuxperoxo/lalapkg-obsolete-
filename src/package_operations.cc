@@ -4,12 +4,14 @@
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.  |
 //=========================================/
 
+#include <cstddef>
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <filesystem>
 #include <vector>
 #include <stdexcept>
+#include <libconfig.h++>
 
 #define RED "\033[031m"
 #define GREEN "\033[032m"
@@ -18,7 +20,7 @@
 #include "package_operations.h"
 #include "check.h"
 
-std::string package_exist(const std::string &repo, std::string& package_name, const std::string &script_file_name){
+std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name){
   std::vector<std::string> repo_sub_dirs;
 
   try{
@@ -36,7 +38,11 @@ std::string package_exist(const std::string &repo, std::string& package_name, co
     for(const auto& dirs : repo_sub_dirs){
       if(check_is_dir(dirs + "/" + package_name)){
         if(check_is_file(dirs + "/" + package_name + "/" + script_file_name)){
-          return dirs + "/" + package_name + "/" + script_file_name;
+          if(check_is_file(dirs + "/" + package_name + "/" + info_file_name)){
+            return dirs + "/" + package_name + "/";
+          } else {
+            throw std::runtime_error("Info file not found in -> " GREEN + dirs + "/" + package_name + "/" + info_file_name + NC);
+          }
         } else {
           throw std::runtime_error("Script file not found in -> " GREEN + dirs + "/" + package_name + "/" + script_file_name + NC);
         }
@@ -50,4 +56,11 @@ std::string package_exist(const std::string &repo, std::string& package_name, co
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     return "";
   }
+}
+
+int get_infos(std::string* var_ptr[], std::string& pkglocale){
+  libconfig::Config file;
+
+  const std::string lookup_vars[] = {"PKGNAME", "PKGVERSION", "PKGSOURCE", "PKGDESC", "PKGEXTENSION"};
+  
 }
