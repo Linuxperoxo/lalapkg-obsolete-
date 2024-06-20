@@ -18,6 +18,7 @@ CHANGE LOG:
      Manipulação do pacote;                                            
    * Nova função adicionada em package_operations;                     
 
+-------------------------------------------------------------------------------
 
  TO DOS:                                                            
                                                             
