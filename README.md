@@ -1,6 +1,6 @@
 # lalapkg
-
-CHANGE LOG:                                                        
+-----------------------------------------------------------------------------
+# CHANGE LOG:                                                        
 
   1.1.1a:                                                              
    * Melhorias no código;                                              
@@ -20,7 +20,7 @@ CHANGE LOG:
 
 -------------------------------------------------------------------------------
 
- TO DOS:                                                            
+ # TO DOS:                                                            
                                                             
  * Refazer toda função parse_arguments;                              
  * Fazer função get_infos em package_operations;                     
