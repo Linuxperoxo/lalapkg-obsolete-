@@ -84,7 +84,7 @@
 
 const std::string config_file = "/etc/lala.conf";
 const std::string repo_dir = "/var/lalapkg/repo";
-const std::string info_file = "Pkg-infos";
+const std::string info_file = "Pkginfos";
 const std::string build_file = "Buildpkg";
 const std::string world_dir = "/var/lalapkg/world/";
 
