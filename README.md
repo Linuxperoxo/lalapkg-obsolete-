@@ -2,22 +2,23 @@
 
 CHANGE LOG:                                                        
 
-1.1.1a:                                                              
- * Melhorias no código;                                              
- * Agora a base dos argumentos principais foram adicionados;         
- * Novo .h "package_operations.h";                                   
- * Adicionado suporte a instalação enfileirada de pacotes;
+  1.1.1a:                                                              
+   * Melhorias no código;                                              
+   * Agora a base dos argumentos principais foram adicionados;         
+   * Novo .h "package_operations.h";                                   
+   * Adicionado suporte a instalação enfileirada de pacotes;
                                         
-1.1.2a:                                                             
- * Correção de bugs;                                                 
- * Novo .h "package.h";                                              
- * Os argumentos foram removidos no momento;                         
- * Novo arquivo no repositorio "Pkg-infos";                          
- * Função package_exist foi adaptada;                                
- * Classe para pacotes foi adicionado para melhor organização e      
-   Manipulação do pacote;                                            
- * Nova função adicionada em package_operations;                     
------------------------------
+  1.1.2a:                                                             
+   * Correção de bugs;                                                 
+   * Novo .h "package.h";                                              
+   * Os argumentos foram removidos no momento;                         
+   * Novo arquivo no repositorio "Pkg-infos";                          
+   * Função package_exist foi adaptada;                                
+   * Classe para pacotes foi adicionado para melhor organização e      
+     Manipulação do pacote;                                            
+   * Nova função adicionada em package_operations;                     
+
+
  TO DOS:                                                            
                                                             
  * Refazer toda função parse_arguments;                              
