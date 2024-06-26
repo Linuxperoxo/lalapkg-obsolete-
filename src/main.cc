@@ -39,18 +39,22 @@
 | * Classe para pacotes foi adicionado para melhor organização e      |
 |   Manipulação do pacote;                                            |
 | * Nova função adicionada em package_operations;                     |
+|                                                                     |
+|1.1.2-1a:                                                            |
+| * Correção de bugs;                                                 |
+| * Função parse_arguments melhorada;                                 |
+| * Destrutor da classe Package adicionado;                           |
+| * Melhorias na eficiência do código;                                |
+| * Função get_infos adicionada                                       |
 |=====================================================================|
 
 |=====================================================================|
 | TO DOS |                                                            |
 |---------                                                            |
-| * Refazer toda função parse_arguments;                              |
-| * Fazer função get_infos em package_operations;                     |
 | * Adicionar funções na classe Package para manipulação do pacote;   |
 | * Primeiros pacotes serão adicionados ao repositorio para testar    |
 |   Funções básicas do gerenciador;                                   |
 |=====================================================================| 
-
 
 */
 
@@ -72,13 +76,7 @@
 #include "check.h"
 #include "package_operations.h"
 #include "package.h"
-
-//==========================================================| MACROS
-
-#define RED "\033[031m"
-#define GREEN "\033[032m"
-#define YELLOW "\033[033m"
-#define NC "\033[0m"
+#include "color.h"
 
 //==========================================================| CONST VARS
 
@@ -88,7 +86,7 @@ const std::string info_file = "Infopkg";
 const std::string build_file = "Buildpkg";
 const std::string world_dir = "/var/lalapkg/world/";
 
-//==========================================================| PACKAGE_VECTOR
+//==========================================================| PACKAGE VECTOR
 
 std::vector<std::string> packages_vector;
 
@@ -99,12 +97,11 @@ struct Config_file{
   std::string source_dir;
   std::string root_dir;
   std::string installbin_dir;
-  std::string custom_repo;
   std::string common_flags;
   std::string jobs;
 };
 
-Config_file conf_file;
+Config_file* conf_file = new Config_file;
 
 //==========================================================| FUNCTIONS
 
@@ -114,8 +111,8 @@ int load_config(const std::string& file){
   try{
     conf_obj.readFile(file);
     
-    const std::string var_names[] = {"sync", "source_dir", "root_dir", "installbin_dir", "custom_repo", "common_flags", "jobs"};
-    std::string* var_pts[] = {&conf_file.sync, &conf_file.source_dir, &conf_file.root_dir, &conf_file.installbin_dir, &conf_file.custom_repo, &conf_file.common_flags, &conf_file.jobs};
+    const std::string var_names[] = {"sync", "source_dir", "root_dir", "installbin_dir", "common_flags", "jobs"};
+    std::string* var_pts[] = {&conf_file->sync, &conf_file->source_dir, &conf_file->root_dir, &conf_file->installbin_dir, &conf_file->common_flags, &conf_file->jobs};
     
     const size_t size = sizeof(var_pts) / sizeof(var_pts[0]);
 
@@ -151,12 +148,12 @@ int load_config(const std::string& file){
   }
 
   catch(libconfig::ParseException &paex){
-    std::cerr << RED << "ERROR: " << NC <<  "Parse error in build file -> " << GREEN << paex.getFile() << NC <<" -> " << RED << paex.getError() << NC << " ->" << " line -> " << RED << paex.getLine() << NC << std::endl;
+    std::cerr << RED << "ERROR: " << NC <<  "Parse error in build file -> " << GREEN << paex.getFile() << NC << " -> " << RED << paex.getError() << NC << " -> " << "line -> " << RED << paex.getLine() << NC << std::endl;
     return EXIT_FAILURE;
   }
 
   catch(libconfig::FileIOException &fioex){
-    std::cerr << RED << "ERROR: " << NC << "I/O error reading build file ->" << RED << fioex.what() << NC << std::endl;
+    std::cerr << RED << "ERROR: " << NC << "I/O error reading build file -> " << RED << fioex.what() << NC << std::endl;
     return EXIT_FAILURE;
   }
 }
@@ -186,11 +183,49 @@ int check_dirs(const std::string* dirs[], const std::string& warning_dir, const 
   return EXIT_SUCCESS;
 }
 
-void put_package_in_vector(std::string& package){ 
-  packages_vector.push_back(package);
-}
+char parse_arguments(char* arg[], int& num_args, char& user_arg){
+  int packages_founds = 0;
 
-void parse_arguments(char* arg[], int& num_args){
+  for(int i = 0; i < num_args; i++){
+    if(arg[i][0] == '-'){
+      switch(arg[i][1]){
+        case 'e':
+          user_arg = 'e';
+
+          while(arg[++i] != nullptr){
+            packages_vector.push_back(arg[i]);
+            packages_founds++;
+          }
+        break;
+
+        case 'u':
+          user_arg = 'u';
+
+          while(arg[++i] != nullptr){
+            packages_vector.push_back(arg[i]);
+            packages_founds++;
+          }
+        break;
+
+        default:
+          std::cerr << RED << "ERROR: " << NC << "Invalid argument: " << GREEN << arg[i] << NC << std::endl;  
+          return EXIT_FAILURE;
+        break;
+      }
+    }
+  }
+
+  if(user_arg == '\0'){
+    std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "argument" << NC << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if(packages_founds > 0){
+    return EXIT_SUCCESS;
+  }
+
+  std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "package" << NC << std::endl;
+  return EXIT_FAILURE;
 }
 
 int emerge(std::string pkg){
@@ -199,31 +234,26 @@ int emerge(std::string pkg){
   if(pkgroot == ""){
     return EXIT_FAILURE;
   }
-  
-  Package newpkg(pkgroot + info_file, pkgroot + build_file);
+
+  Package* newpkg = nullptr;
+
+  try{
+    Package* newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
+
+    newpkg->makepkg(conf_file->source_dir, conf_file->common_flags, conf_file->jobs);
+  }
+
+  catch(std::runtime_error &error){
+    std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
+    std::cerr << RED << "ERROR: " << pkg << NC << " package failure!" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }
 
-//==========================================================| MAIN
-
-int main(int argc, char* argv[]){
-  const std::string* check_this_dirs[] = {&conf_file.source_dir, &conf_file.root_dir, &conf_file.installbin_dir, &conf_file.custom_repo, &repo_dir, &world_dir}; 
-  const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
-
-  if(load_config(config_file) == EXIT_FAILURE){
-    return EXIT_FAILURE;
-  }
-
-  if(check_dirs(check_this_dirs, repo_dir, size) == EXIT_FAILURE){
-    return EXIT_FAILURE;
-  }
-
-  //const char arg = parse_arguments(argv, argc);
-
-//==========================================================| MAIN SWITCH
-  
-  switch('e'){
+int main_switch_loop(char& user_arg){
+  switch(user_arg){
     case 'e':
       for(const auto& vector : packages_vector){
         emerge(vector);
@@ -232,14 +262,37 @@ int main(int argc, char* argv[]){
 
     case 'u':
       for(const auto& vector : packages_vector){
+        // unmerge
       }
     break;
+  }
+  return EXIT_FAILURE;
+}
 
-    default:
-      std::cerr << RED << "ERROR: " << NC << "U must pass an valid argument!" << std::endl;
-    break;
+//==========================================================| MAIN
+
+int main(int argc, char* argv[]){
+  const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->installbin_dir, &repo_dir, &world_dir}; 
+  const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
+  
+  char arg;
+  
+  if(load_config(config_file) == EXIT_FAILURE){
+    return EXIT_FAILURE;
   }
 
-//==========================================================| END MAIN SWITCH
-  return 0;
+  if(check_dirs(check_this_dirs, repo_dir, size) == EXIT_FAILURE){
+    return EXIT_FAILURE;
+  }
+
+  if(parse_arguments(argv, argc, arg) == EXIT_FAILURE){
+    return EXIT_FAILURE;
+  }
+
+  if(main_switch_loop(arg) == EXIT_FAILURE){
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
+

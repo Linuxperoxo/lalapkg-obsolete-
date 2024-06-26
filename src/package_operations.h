@@ -8,8 +8,10 @@
 #define PACKAGE_OPERATIONS_H
 
 #include <string>
+#include <vector>
 
 std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name);
-int get_infos(const std::string* vars_ptr[]);
+int get_infos(std::string* vars_ptr[], std::string& pkginfo_locale);
+int get_functions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions, std::string& pkgscript_locale);
 
 #endif 
