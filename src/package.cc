@@ -31,8 +31,16 @@ Package::~Package(){
   
 }
 
+std::string Package::get_pkgname() const{
+  return this->pkgname;
+}
+
+std::string Package::get_pkgversion() const{
+  return this->pkgversion;
+}
+
 void Package::run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir){
-  for(const auto& functions : build_functions){
+  for(const auto& functions : vector_functions){
     int result = system(("cd " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + " && source " + this->pkgscript_locale + " && " + functions).c_str());
     if(result != 0){
       std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
@@ -42,26 +50,14 @@ void Package::run_vector_functions(std::vector<std::string>& vector_functions, s
   }
 }
 
-int Package::makepkg(std::string& source_dir, std::string& common_flags, std::string& jobs){
-  const std::string* load_var[] = {&common_flags, &common_flags, &jobs};
-  const std::string name_var[] = {"CFLAGS", "CXXFLAGS" ,"MAKEOPTS"};
-  static bool is_load = false; 
-  
-   if(!is_load){
-     for(int i = 0; i < sizeof(name_var) / sizeof(name_var[0]); i++){
-       if(setenv(name_var[i].c_str(), load_var[i]->c_str(), 1) != 0){
-         throw std::runtime_error("Error set env var -> "  GREEN + name_var[i] + NC);
-       }
-    }
-    is_load = true;  
-  }
-    
+int Package::makepkg(std::string& source_dir){
   if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)) { 
     std::cout << GREEN << ">>> " << NC << "Starting source download: " << GREEN << this->pkgsource << NC << std::endl;
 
     int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource).c_str());
 
     if(result != 0){
+      std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
       throw std::runtime_error("Unable to download package source -> " GREEN + this->pkgsource + NC);
     }
   } else {
@@ -80,11 +76,21 @@ int Package::makepkg(std::string& source_dir, std::string& common_flags, std::st
   
   Package::run_vector_functions(build_functions, source_dir);
 
-  std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
   return EXIT_SUCCESS;
 }
 
-int Package::installpkg(std::string& installbin_dir, const std::string& world_dir, std::string& source_dir){
+int Package::installpkg(const std::string& world_dir, std::string& source_dir){
+   
+  const char* fakeroot_var_name = "FAKEROOT";
+  std::string fakeroot_value = getenv("FAKEROOT");
+  fakeroot_value += "/" + this->pkgname + "-" + this->pkgversion;
+  
+  setenv(fakeroot_var_name,(fakeroot_value).c_str(), 1);
+
   Package::run_vector_functions(install_functions, source_dir);
+
+  std::filesystem::remove_all(fakeroot_value);
+  
+  return 0;
 }
 

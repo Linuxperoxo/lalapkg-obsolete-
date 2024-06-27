@@ -51,17 +51,10 @@
 |=====================================================================|
 | TO DOS |                                                            |
 |---------                                                            |
-| RUNNING: Adicionar funções na classe Package para manipulação       |
-| do pacote;                                                          |
+| * Adicionar funções na classe Package para manipulação do pacote;   |
 | * Primeiros pacotes serão adicionados ao repositorio para testar    |
 |   Funções básicas do gerenciador;                                   |
 |=====================================================================| 
-
-Esse commit ainda está incompleto, mas os códigos que foram adicionadas
-estão funcionando como esperado. Na teoria a parte da compilação está
-funcionando muito bem, mas faltam alguns teste para comprovar 100%
-seu funcionamento. A instalação do pacote ainda não está sendo efetuada, 
-mas o código original já possue a instalação no estágio beta.
 
 */
 
@@ -92,6 +85,7 @@ const std::string repo_dir = "/var/lalapkg/repo";
 const std::string info_file = "Infopkg";
 const std::string build_file = "Buildpkg";
 const std::string world_dir = "/var/lalapkg/world/";
+const std::string installbin_dir = "/tmp/lalapkg/fakeroot";
 
 //==========================================================| PACKAGE VECTOR
 
@@ -102,8 +96,8 @@ std::vector<std::string> packages_vector;
 struct Config_file{
   std::string sync;
   std::string source_dir;
+  std::string pkg_dir;
   std::string root_dir;
-  std::string installbin_dir;
   std::string common_flags;
   std::string jobs;
 };
@@ -118,8 +112,8 @@ int load_config(const std::string& file){
   try{
     conf_obj.readFile(file);
     
-    const std::string var_names[] = {"sync", "source_dir", "root_dir", "installbin_dir", "common_flags", "jobs"};
-    std::string* var_pts[] = {&conf_file->sync, &conf_file->source_dir, &conf_file->root_dir, &conf_file->installbin_dir, &conf_file->common_flags, &conf_file->jobs};
+    const std::string var_names[] = {"sync", "source_dir", "root_dir", "pkg_dir", "common_flags", "jobs"};
+    std::string* var_pts[] = {&conf_file->sync, &conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &conf_file->common_flags, &conf_file->jobs};
     
     const size_t size = sizeof(var_pts) / sizeof(var_pts[0]);
 
@@ -247,16 +241,23 @@ int emerge(std::string pkg){
   try{
     Package* newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
 
-    newpkg->makepkg(conf_file->source_dir, conf_file->common_flags, conf_file->jobs);
-    newpkg->installpkg(conf_file->installbin_dir, world_dir, conf_file->source_dir);
+    const std::string pkgname = newpkg->get_pkgname();
+    const std::string pkgversion = newpkg->get_pkgversion();
+
+    newpkg->makepkg(conf_file->source_dir);
+    newpkg->installpkg(world_dir, conf_file->source_dir);
+
+    std::filesystem::remove_all(conf_file->source_dir + "/" + pkgname + "-" + pkgversion);
+
+    delete newpkg;
   }
 
   catch(std::runtime_error &error){
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     std::cerr << RED << "ERROR: " << pkg << NC << " package failure!" << std::endl;
+    delete newpkg;
     return EXIT_FAILURE;
   }
-
   return EXIT_SUCCESS;
 }
 
@@ -280,15 +281,19 @@ int main_switch_loop(char& user_arg){
 //==========================================================| MAIN
 
 int main(int argc, char* argv[]){
-  const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->installbin_dir, &repo_dir, &world_dir}; 
+  const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &repo_dir, &world_dir}; 
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
   
   char arg;
-  
+
   if(load_config(config_file) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
-
+  
+  if(loadenv_var(conf_file->common_flags, conf_file->jobs, installbin_dir, conf_file->pkg_dir) == EXIT_FAILURE){
+    return EXIT_FAILURE;
+  }
+  
   if(check_dirs(check_this_dirs, repo_dir, size) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }

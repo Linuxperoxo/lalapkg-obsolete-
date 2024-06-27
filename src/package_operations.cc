@@ -54,6 +54,33 @@ std::string package_exist(const std::string& repo, std::string& package_name, co
   }
 }
 
+int loadenv_var(std::string& common_flags, std::string& jobs, const std::string& installbin_dir, std::string& pkg_dir){ 
+  const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEOPTS", "FAKEROOT", "PKGS"};
+  const char* var_value[] = {common_flags.c_str(), common_flags.c_str(), jobs.c_str(), installbin_dir.c_str(), pkg_dir.c_str()};
+
+  const size_t size = sizeof(var_name) / sizeof(var_name[0]);
+
+  for(int i = 0; i < size; i++){
+    setenv(var_name[i], var_value[i], 1);
+    char* check_var = getenv(var_name[i]);
+    if(check_var == nullptr){
+      std::cerr << RED << "ERROR: " << NC << "Unable to set variable -> " RED << var_name[i] << NC << std::endl;  
+      return EXIT_FAILURE;
+    }
+  }
+  return EXIT_SUCCESS;
+}
+
+void unsetenv_var(){
+  const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEOPTS", "FAKEROOT", "PKGS"};
+
+  for(int i = 0; i < sizeof(var_name) / sizeof(var_name[0]); i++){
+    if(unsetenv(var_name[i]) != 0){
+      std::cerr << YELLOW << "WARNING: " << NC << "Unable to unset variable -> " << var_name[i] << std::endl;
+    }
+  }
+}
+
 int get_infos(std::string* var_ptr[], std::string& pkginfo_locale){
   libconfig::Config file;
 

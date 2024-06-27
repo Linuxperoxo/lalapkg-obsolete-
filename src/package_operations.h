@@ -11,7 +11,13 @@
 #include <vector>
 
 std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name);
+
 int get_infos(std::string* vars_ptr[], std::string& pkginfo_locale);
+
 int get_functions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions, std::string& pkgscript_locale);
+
+int loadenv_var(std::string& common_flags, std::string& jobs, const std::string& installbin_dir, std::string& pkg_dir);
+
+void unsetenv_var();
 
 #endif 
