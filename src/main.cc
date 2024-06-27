@@ -51,10 +51,17 @@
 |=====================================================================|
 | TO DOS |                                                            |
 |---------                                                            |
-| * Adicionar funções na classe Package para manipulação do pacote;   |
+| RUNNING: Adicionar funções na classe Package para manipulação       |
+| do pacote;                                                          |
 | * Primeiros pacotes serão adicionados ao repositorio para testar    |
 |   Funções básicas do gerenciador;                                   |
 |=====================================================================| 
+
+Esse commit ainda está incompleto, mas os códigos que foram adicionadas
+estão funcionando como esperado. Na teoria a parte da compilação está
+funcionando muito bem, mas faltam alguns teste para comprovar 100%
+seu funcionamento. A instalação do pacote ainda não está sendo efetuada, 
+mas o código original já possue a instalação no estágio beta.
 
 */
 
