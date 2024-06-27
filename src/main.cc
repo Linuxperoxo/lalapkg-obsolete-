@@ -51,17 +51,10 @@
 |=====================================================================|
 | TO DOS |                                                            |
 |---------                                                            |
-| RUNNING: Adicionar funções na classe Package para manipulação       |
-| do pacote;                                                          |
+| * Adicionar funções na classe Package para manipulação do pacote;   |
 | * Primeiros pacotes serão adicionados ao repositorio para testar    |
 |   Funções básicas do gerenciador;                                   |
 |=====================================================================| 
-
-  Esse commit ainda está incompleto mas as coisas que foram adicionadas
-estão funcionando perfeitamente. Na teoria a parte da compilação está
-funcionando como esperado, mas faltam alguns teste para comprovar 100%
-seu funcionamento. A instalação do pacote ainda não está sendo efetuada, 
-mas o código original já possue a instalação no estágio beta. 
 
 */
 
@@ -248,6 +241,7 @@ int emerge(std::string pkg){
     Package* newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
 
     newpkg->makepkg(conf_file->source_dir, conf_file->common_flags, conf_file->jobs);
+    newpkg->installpkg(conf_file->installbin_dir, world_dir, conf_file->source_dir);
   }
 
   catch(std::runtime_error &error){

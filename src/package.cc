@@ -31,6 +31,17 @@ Package::~Package(){
   
 }
 
+void Package::run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir){
+  for(const auto& functions : build_functions){
+    int result = system(("cd " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + " && source " + this->pkgscript_locale + " && " + functions).c_str());
+    if(result != 0){
+      std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
+      std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
+      throw std::runtime_error("Error in function -> " GREEN + functions + NC ", file -> " GREEN + this->pkgscript_locale + NC);
+    }
+  }
+}
+
 int Package::makepkg(std::string& source_dir, std::string& common_flags, std::string& jobs){
   const std::string* load_var[] = {&common_flags, &common_flags, &jobs};
   const std::string name_var[] = {"CFLAGS", "CXXFLAGS" ,"MAKEOPTS"};
@@ -45,12 +56,10 @@ int Package::makepkg(std::string& source_dir, std::string& common_flags, std::st
     is_load = true;  
   }
     
-  std::string full_name = this->pkgname + "-" + this->pkgversion + "." + this->pkgextension;
-
-  if(!check_is_file(source_dir + "/" + full_name)) { 
+  if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)) { 
     std::cout << GREEN << ">>> " << NC << "Starting source download: " << GREEN << this->pkgsource << NC << std::endl;
 
-    int result = system(("wget -O " + source_dir + "/" + full_name + " " + this->pkgsource).c_str());
+    int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource).c_str());
 
     if(result != 0){
       throw std::runtime_error("Unable to download package source -> " GREEN + this->pkgsource + NC);
@@ -59,26 +68,23 @@ int Package::makepkg(std::string& source_dir, std::string& common_flags, std::st
     std::cout << GREEN << ">>> " << NC << "Source is already installed! Skipping..." << std::endl; 
   }
 
-  std::cout << GREEN << ">>> " << NC << "Unpacking: " << GREEN << full_name << NC << std::endl;
+  std::cout << GREEN << ">>> " << NC << "Unpacking: " << GREEN << this->pkgname + "-" + this->pkgversion + "." + this->pkgextension << NC << std::endl;
 
-  int result = system(("cd " + source_dir + " && tar xpvf " + full_name).c_str());
+  int result = system(("cd " + source_dir + " && tar xpvf " + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension).c_str());
 
   if(result != 0){
-    std::filesystem::remove(source_dir + "/" + full_name);
+    std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
     std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
-    throw std::runtime_error("Error unpacking tarball: " RED + full_name + NC);
+    throw std::runtime_error("Error unpacking tarball: " RED + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC);
   }
   
-  for(const auto& functions : build_functions){
-    result = system(("source " + this->pkgscript_locale + " && " + functions).c_str());
-    if(result != 0){
-      std::filesystem::remove(source_dir + "/" + full_name);
-      std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
-      throw std::runtime_error("Error in function -> " GREEN + functions + NC ", file -> " GREEN + this->pkgscript_locale + NC);
-    }
-  }
+  Package::run_vector_functions(build_functions, source_dir);
 
   std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
   return EXIT_SUCCESS;
+}
+
+int Package::installpkg(std::string& installbin_dir, const std::string& world_dir, std::string& source_dir){
+  Package::run_vector_functions(install_functions, source_dir);
 }
 

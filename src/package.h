@@ -33,8 +33,9 @@ public:
   Package(const std::string& pkginfo_locale, const std::string& pkgscript_locale);
   ~Package();
 
-  int makepkg(std::string& source_dir,std::string& common_flags, std::string& jobs);
-  int installpkg();
+  int makepkg(std::string& source_dir, std::string& common_flags, std::string& jobs);
+  int installpkg(std::string& installbin_dir, const std::string& world_dir, std::string& source_dir);
+  void run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir);
 };
 
 #endif
