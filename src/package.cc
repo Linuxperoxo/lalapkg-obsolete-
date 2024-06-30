@@ -4,15 +4,18 @@
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
 
+#include <atomic>
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <filesystem>
 
 #include "package.h"
 #include "check.h"
 #include "package_operations.h"
+#include "animation.h"
 #include "color.h"
 
 Package::Package(const std::string& pkginfo_locale, const std::string& pkgscript_locale) : pkginfo_locale(pkginfo_locale), pkgscript_locale(pkgscript_locale){
@@ -51,22 +54,35 @@ void Package::run_vector_functions(std::vector<std::string>& vector_functions, s
 }
 
 int Package::makepkg(std::string& source_dir){
-  if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)) { 
-    std::cout << GREEN << ">>> " << NC << "Starting source download: " << GREEN << this->pkgsource << NC << std::endl;
+  std::atomic<bool> done = false;
 
-    int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource).c_str());
+  if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)) { 
+
+    std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Installing source: " GREEN + this->pkgsource + NC);
+
+    int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource + " &> /dev/null").c_str());
+
+    done = true;
+
+    animationThread.join();
 
     if(result != 0){
       std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
       throw std::runtime_error("Unable to download package source -> " GREEN + this->pkgsource + NC);
     }
   } else {
-    std::cout << GREEN << ">>> " << NC << "Source is already installed! Skipping..." << std::endl; 
+    std::cout << YELLOW << ">>> " << NC << "Source is already installed! Skipping..." << std::endl; 
   }
 
-  std::cout << GREEN << ">>> " << NC << "Unpacking: " << GREEN << this->pkgname + "-" + this->pkgversion + "." + this->pkgextension << NC << std::endl;
+  done = false;
 
-  int result = system(("cd " + source_dir + " && tar xpvf " + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension).c_str());
+  std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC);
+
+  int result = system(("cd " + source_dir + " && tar xpvf " + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " &> /dev/null").c_str());
+
+  done = true;
+
+  animationThread.join();
 
   if(result != 0){
     std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
@@ -79,7 +95,7 @@ int Package::makepkg(std::string& source_dir){
   return EXIT_SUCCESS;
 }
 
-int Package::installpkg(const std::string& world_dir, std::string& source_dir){
+int Package::installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir){
    
   const char* fakeroot_var_name = "FAKEROOT";
   std::string fakeroot_value = getenv("FAKEROOT");
@@ -88,6 +104,28 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir){
   setenv(fakeroot_var_name,(fakeroot_value).c_str(), 1);
 
   Package::run_vector_functions(install_functions, source_dir);
+
+  const std::string pkgs = pkgs_dir + "/" + this->pkgname + "-" + this->pkgversion;
+
+  if(!check_is_file(pkgs + ".lala.tar.gz")){
+    std::atomic<bool> done = false;
+
+    std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC);
+
+    int result = system(("cd $FAKEROOT && tar cvzf " + pkgs + ".lala.tar.gz . &> /dev/null").c_str());
+
+    done = true;
+
+    animationThread.join();
+
+    if(result != 0){
+      throw std::runtime_error("Error creating package");
+    } else {
+      std::cerr << GREEN << ">>> " << NC <<"Package created in: " << GREEN << pkgs << NC << std::endl;
+    }
+  } else {
+    std::cerr << YELLOW << ">>> " << NC << "Package already exists! Skipping..." << std::endl;
+  }
 
   std::filesystem::remove_all(fakeroot_value);
   

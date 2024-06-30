@@ -19,44 +19,38 @@
 std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name){
   std::vector<std::string> repo_sub_dirs;
 
-  try{
-    if(!check_is_dir(repo)){
-      throw std::runtime_error("repository directory -> " GREEN + repo + NC " does not exist, use"  GREEN " lalapkg --sync" NC);
-    }
+  if(!check_is_dir(repo)){
+    throw std::runtime_error("repository directory -> " GREEN + repo + NC " does not exist, use"  GREEN " lalapkg --sync" NC);
+  }
 
-    for(const auto& sub_dirs : std::filesystem::directory_iterator(repo)){
-      if(std::filesystem::is_directory(sub_dirs)) {
-        std::string directory = sub_dirs.path().string();
-        repo_sub_dirs.push_back(directory);
-      }
-    }
-
-    for(const auto& dirs : repo_sub_dirs){
-      if(check_is_dir(dirs + "/" + package_name)){
-        if(check_is_file(dirs + "/" + package_name + "/" + script_file_name)){
-          if(check_is_file(dirs + "/" + package_name + "/" + info_file_name)){
-            return dirs + "/" + package_name + "/";
-          } else {
-            throw std::runtime_error("Info file not found in -> " GREEN + dirs + "/" + package_name + "/" + info_file_name + NC);
-          }
-        } else {
-          throw std::runtime_error("Script file not found in -> " GREEN + dirs + "/" + package_name + "/" + script_file_name + NC);
-        }
-      } else {
-        throw std::runtime_error("Package -> " GREEN + package_name + NC " not found");
-      }
+  for(const auto& sub_dirs : std::filesystem::directory_iterator(repo)){
+    if(std::filesystem::is_directory(sub_dirs)) {
+      std::string directory = sub_dirs.path().string();
+      repo_sub_dirs.push_back(directory);
     }
   }
 
-  catch(std::runtime_error &error){
-    std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
-    return "";
+  for(const auto& dirs : repo_sub_dirs){
+    if(check_is_dir(dirs + "/" + package_name)){
+      if(check_is_file(dirs + "/" + package_name + "/" + script_file_name)){
+        if(check_is_file(dirs + "/" + package_name + "/" + info_file_name)){
+          return dirs + "/" + package_name + "/";
+        } else {
+          throw std::runtime_error("Info file not found in -> " GREEN + dirs + "/" + package_name + "/" + info_file_name + NC);
+        }
+      } else {
+        throw std::runtime_error("Script file not found in -> " GREEN + dirs + "/" + package_name + "/" + script_file_name + NC);
+      }
+    } else {
+      throw std::runtime_error("Package -> " GREEN + package_name + NC " not found");
+    }
   }
 }
 
-int loadenv_var(std::string& common_flags, std::string& jobs, const std::string& installbin_dir, std::string& pkg_dir){ 
-  const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEOPTS", "FAKEROOT", "PKGS"};
-  const char* var_value[] = {common_flags.c_str(), common_flags.c_str(), jobs.c_str(), installbin_dir.c_str(), pkg_dir.c_str()};
+
+int loadenv_var(std::string& common_flags, std::string& jobs, const std::string& installbin_dir){ 
+  const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEFLAGS", "FAKEROOT"};
+  const char* var_value[] = {common_flags.c_str(), common_flags.c_str(), jobs.c_str(), installbin_dir.c_str()};
 
   const size_t size = sizeof(var_name) / sizeof(var_name[0]);
 
@@ -72,7 +66,7 @@ int loadenv_var(std::string& common_flags, std::string& jobs, const std::string&
 }
 
 void unsetenv_var(){
-  const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEOPTS", "FAKEROOT", "PKGS"};
+  const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEFLAGS", "FAKEROOT"};
 
   for(int i = 0; i < sizeof(var_name) / sizeof(var_name[0]); i++){
     if(unsetenv(var_name[i]) != 0){
@@ -137,20 +131,12 @@ int get_functions(std::vector<std::string>& build_functions, std::vector<std::st
     }
   }
 
-  try{
-    if(build_functions.empty()){
-      throw std::runtime_error(YELLOW "Build functions " NC "not found in -> "  GREEN + pkgscript_locale + NC);
-    }
-
-    if(install_functions.empty()){
-      throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " GREEN + pkgscript_locale + NC);
-    }
+  if(build_functions.empty()){
+    std::cerr << YELLOW << "WARNING: " << NC << GREEN << "Build functions " << NC << "not found in -> " << GREEN << pkgscript_locale << NC << std::endl;
   }
 
-  catch(std::runtime_error &error){
-    std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
-    return EXIT_FAILURE;
+  if(install_functions.empty()){
+    throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " GREEN + pkgscript_locale + NC);
   }
-
   return EXIT_SUCCESS;
 }

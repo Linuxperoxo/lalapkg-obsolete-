@@ -60,11 +60,9 @@
 
 //==========================================================| LIBS
 
-#include <chrono>
 #include <cstddef>
 #include <iostream>
 #include <string>
-#include <thread>
 #include <cstdlib>
 #include <stdexcept>
 #include <vector>
@@ -159,31 +157,6 @@ int load_config(const std::string& file){
   }
 }
 
-int check_dirs(const std::string* dirs[], const std::string& warning_dir, const int num_dirs){
-  for(int i = 0; i < num_dirs; i++){
-    if(!check_is_dir(*dirs[i])){
-      if(*dirs[i] == warning_dir){
-        std::cerr << YELLOW << "WARNING: " << NC << "repository directory -> " << GREEN << *dirs[i] << NC << " does not exist, use" << GREEN << " lalapkg --sync" << NC << std::endl;
-      } else {
-        std::cerr << YELLOW << "WARNING: " << NC << "Directory -> " << GREEN << *dirs[i] << NC << " not found" << std::endl;
-        
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        
-        try{
-          std::filesystem::create_directories(*dirs[i]);
-          std::cout << ">>> Created Directory -> " << GREEN << *dirs[i] << NC << std::endl;
-        }
-
-        catch(std::filesystem::filesystem_error &error){
-          std::cerr << RED << "ERROR: " << NC << "Failed to create directory -> " << GREEN << *dirs[i] << ": " << NC << error.what() << std::endl; 
-          return EXIT_FAILURE;
-        }
-      }
-    }
-  }
-  return EXIT_SUCCESS;
-}
-
 char parse_arguments(char* arg[], int& num_args, char& user_arg){
   int packages_founds = 0;
 
@@ -230,22 +203,18 @@ char parse_arguments(char* arg[], int& num_args, char& user_arg){
 }
 
 int emerge(std::string pkg){
-  const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
-
-  if(pkgroot == ""){
-    return EXIT_FAILURE;
-  }
-
   Package* newpkg = nullptr;
 
   try{
+    const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
+  
     Package* newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
 
     const std::string pkgname = newpkg->get_pkgname();
     const std::string pkgversion = newpkg->get_pkgversion();
 
     newpkg->makepkg(conf_file->source_dir);
-    newpkg->installpkg(world_dir, conf_file->source_dir);
+    newpkg->installpkg(world_dir, conf_file->source_dir, conf_file->pkg_dir);
 
     std::filesystem::remove_all(conf_file->source_dir + "/" + pkgname + "-" + pkgversion);
 
@@ -284,13 +253,20 @@ int main(int argc, char* argv[]){
   const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &repo_dir, &world_dir}; 
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
   
+  const std::string user_name = getenv("USER");
+
+  if(user_name != "root"){
+    std::cerr << RED << "ERROR: " << NC << "Are u sudo?" << std::endl;
+    return EXIT_FAILURE;
+  }
+  
   char arg;
 
   if(load_config(config_file) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
   
-  if(loadenv_var(conf_file->common_flags, conf_file->jobs, installbin_dir, conf_file->pkg_dir) == EXIT_FAILURE){
+  if(loadenv_var(conf_file->common_flags, conf_file->jobs, installbin_dir) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
   
