@@ -7,6 +7,7 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
+#include <vector>
 
 #include "check.h"
 #include "color.h"
@@ -44,4 +45,49 @@ int check_dirs(const std::string* dirs[], const std::string& warning_dir, const 
     }
   }
   return EXIT_SUCCESS;
+}
+
+char check_argument(char* arg[], int& num_args, char& user_arg, std::vector<std::string>& packages_vector){
+  int packages_founds = 0;
+
+  for(int i = 0; i < num_args; i++){
+    if(arg[i][0] == '-'){
+      switch(arg[i][1]){
+        case 'e':
+          user_arg = 'e';
+
+          while(arg[++i] != nullptr){
+            packages_vector.push_back(arg[i]);
+            packages_founds++;
+          }
+        break;
+
+        case 'u':
+          user_arg = 'u';
+
+          while(arg[++i] != nullptr){
+            packages_vector.push_back(arg[i]);
+            packages_founds++;
+          }
+        break;
+
+        default:
+          std::cerr << RED << "ERROR: " << NC << "Invalid argument: " << GREEN << arg[i] << NC << std::endl;  
+          return EXIT_FAILURE;
+        break;
+      }
+    }
+  }
+
+  if(user_arg == '\0'){
+    std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "argument" << NC << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if(packages_founds > 0){
+    return EXIT_SUCCESS;
+  }
+
+  std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "package" << NC << std::endl;
+  return EXIT_FAILURE;
 }
