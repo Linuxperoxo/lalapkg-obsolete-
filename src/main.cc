@@ -75,6 +75,7 @@
 #include "package_operations.h"
 #include "package.h"
 #include "color.h"
+#include "config_file.h"
 
 //==========================================================| CONST VARS
 
@@ -89,118 +90,9 @@ const std::string installbin_dir = "/tmp/lalapkg/fakeroot";
 
 std::vector<std::string> packages_vector;
 
-//==========================================================| CONFIG_FILE STRUCT 
-
-struct Config_file{
-  std::string sync;
-  std::string source_dir;
-  std::string pkg_dir;
-  std::string root_dir;
-  std::string common_flags;
-  std::string jobs;
-};
-
 Config_file* conf_file = new Config_file;
 
 //==========================================================| FUNCTIONS
-
-int load_config(const std::string& file){
-  libconfig::Config conf_obj;
-  
-  try{
-    conf_obj.readFile(file);
-    
-    const std::string var_names[] = {"sync", "source_dir", "root_dir", "pkg_dir", "common_flags", "jobs"};
-    std::string* var_pts[] = {&conf_file->sync, &conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &conf_file->common_flags, &conf_file->jobs};
-    
-    const size_t size = sizeof(var_pts) / sizeof(var_pts[0]);
-
-    bool ERROR = false;
-
-    std::cout << GREEN << "|==========VAR-RESULTS=========|" << NC << std::endl;
-    
-    for(int i = 0; i < size; i++){
-      conf_obj.lookupValue(var_names[i], *var_pts[i]);
-      if(var_pts[i]->empty()){
-        if(var_names[i] == "common_flags" || var_names[i] == "jobs"){
-          std::cerr << var_names[i] << "...   [ " << YELLOW << "WARNING" << NC << " ]" << std::endl;
-        } else {
-          ERROR = true;
-          std::cerr << var_names[i] << "...   [ " << RED << "FAILED" << NC << " ]" << std::endl;
-        }
-      } else {
-        std::cerr << var_names[i] << "...   [ " << GREEN << "OK"<< NC << " ]" << std::endl;
-      }
-    }
-
-    std::cout << GREEN << "|==============================|" << NC << std::endl;
-
-    if(ERROR){
-      throw std::runtime_error("Error while trying to load some var: Check config file -> " GREEN + config_file + NC);
-    }
-    return EXIT_SUCCESS;
-  }
-
-  catch(std::runtime_error &error){
-    std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  catch(libconfig::ParseException &paex){
-    std::cerr << RED << "ERROR: " << NC <<  "Parse error in build file -> " << GREEN << paex.getFile() << NC << " -> " << RED << paex.getError() << NC << " -> " << "line -> " << RED << paex.getLine() << NC << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  catch(libconfig::FileIOException &fioex){
-    std::cerr << RED << "ERROR: " << NC << "I/O error reading build file -> " << RED << fioex.what() << NC << std::endl;
-    return EXIT_FAILURE;
-  }
-}
-
-char parse_arguments(char* arg[], int& num_args, char& user_arg){
-  int packages_founds = 0;
-
-  for(int i = 0; i < num_args; i++){
-    if(arg[i][0] == '-'){
-      switch(arg[i][1]){
-        case 'e':
-          user_arg = 'e';
-
-          while(arg[++i] != nullptr){
-            packages_vector.push_back(arg[i]);
-            packages_founds++;
-          }
-        break;
-
-        case 'u':
-          user_arg = 'u';
-
-          while(arg[++i] != nullptr){
-            packages_vector.push_back(arg[i]);
-            packages_founds++;
-          }
-        break;
-
-        default:
-          std::cerr << RED << "ERROR: " << NC << "Invalid argument: " << GREEN << arg[i] << NC << std::endl;  
-          return EXIT_FAILURE;
-        break;
-      }
-    }
-  }
-
-  if(user_arg == '\0'){
-    std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "argument" << NC << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  if(packages_founds > 0){
-    return EXIT_SUCCESS;
-  }
-
-  std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "package" << NC << std::endl;
-  return EXIT_FAILURE;
-}
 
 int emerge(std::string pkg){
   Package* newpkg = nullptr;
@@ -262,7 +154,7 @@ int main(int argc, char* argv[]){
   
   char arg;
 
-  if(load_config(config_file) == EXIT_FAILURE){
+  if(load_config(config_file, conf_file) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
   
@@ -274,7 +166,7 @@ int main(int argc, char* argv[]){
     return EXIT_FAILURE;
   }
 
-  if(parse_arguments(argv, argc, arg) == EXIT_FAILURE){
+  if(check_argument(argv, argc, arg, packages_vector) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
 
