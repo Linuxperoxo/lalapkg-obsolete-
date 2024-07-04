@@ -1,6 +1,13 @@
+//==========================================|
+//   FILE: config_file.cc                   |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
+#include <ostream>
 #include <string>
 #include <libconfig.h++>
 #include <stdexcept>
@@ -54,27 +61,31 @@ int load_config(const std::string &file, Config_file* conf_file){
 
       std::string user_buffer;
 
-      while(true){
-        std::cerr << YELLOW << "WARNING: " << NC << "Do you want to continue even without setting these variables?" << GREEN << "Y" << NC << "/" << RED << "n" << NC << std::endl;
-        getline(std::cin, user_buffer);
+      std::cerr << YELLOW << "WARNING: " << NC << "Do you want to continue even without setting these variables? " << GREEN << "Y" << NC << "/" << RED << "n" << NC << std::endl;
+      getline(std::cin, user_buffer);
 
-        if(user_buffer[1] != '\0'){
-          continue;
-        } else {
-          std::cout << user_buffer << std::endl;
+      while(true){
+        if(user_buffer[1] == '\0' || user_buffer[0] == '\0'){
           switch(std::tolower(user_buffer[0])){
             case 'y':
               return EXIT_SUCCESS;
             break;
 
             case 'n':
-              EXIT_FAILURE;
+              return EXIT_FAILURE;
             break;
 
             case '\0':
               return EXIT_SUCCESS;
             break;
+
+            case ' ':
+              return EXIT_SUCCESS;
+            break;
           }
+        } else {
+          std::cout << "I didn't understand! " << GREEN << "Y" << NC << "/" << RED << "n" << NC << std::endl;
+          getline(std::cin, user_buffer);
         }
       }
     }

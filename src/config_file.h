@@ -1,3 +1,9 @@
+//==========================================|
+//   FILE: config_file.h                    |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #ifndef CONFIG_FILE_H
 #define CONFIG_FILE_H
 
