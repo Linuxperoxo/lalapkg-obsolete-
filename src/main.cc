@@ -106,7 +106,7 @@ int emerge(std::string pkg){
     const std::string pkgversion = newpkg->get_pkgversion();
 
     newpkg->makepkg(conf_file->source_dir);
-    newpkg->installpkg(world_dir, conf_file->source_dir, conf_file->pkg_dir);
+    newpkg->installpkg(world_dir, conf_file->source_dir, conf_file->pkg_dir, conf_file->root_dir);
 
     std::filesystem::remove_all(conf_file->source_dir + "/" + pkgname + "-" + pkgversion);
 

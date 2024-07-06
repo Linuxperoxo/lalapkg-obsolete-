@@ -95,7 +95,7 @@ int Package::makepkg(std::string& source_dir){
   return EXIT_SUCCESS;
 }
 
-int Package::installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir){
+int Package::installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir, std::string& root_dir){
    
   const char* fakeroot_var_name = "FAKEROOT";
   std::string fakeroot_value = getenv("FAKEROOT");
@@ -105,14 +105,14 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
 
   Package::run_vector_functions(install_functions, source_dir);
 
-  const std::string pkgs = pkgs_dir + "/" + this->pkgname + "-" + this->pkgversion;
+  const std::string pkgs = pkgs_dir + "/" + this->pkgname + "-" + this->pkgversion + ".lala.tar.gz";
 
-  if(!check_is_file(pkgs + ".lala.tar.gz")){
+  if(!check_is_file(pkgs)){
     std::atomic<bool> done = false;
 
     std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC);
 
-    int result = system(("cd $FAKEROOT && tar cvzf " + pkgs + ".lala.tar.gz . &> /dev/null").c_str());
+    int result = system(("cd $FAKEROOT && tar cvzf " + pkgs + " . &> /dev/null").c_str());
 
     done = true;
 
@@ -127,8 +127,18 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
     std::cerr << YELLOW << ">>> " << NC << "Package already exists! Skipping..." << std::endl;
   }
 
+  if(!check_is_dir(root_dir + "/" + world_dir + "/" + this->pkgname)){
+    std::filesystem::create_directories(root_dir + "/" + world_dir + "/" + this->pkgname);
+  }
+
+  std::cout << pkgs << std::endl;
+
+  system(("tar xpvf " + pkgs + " -C " + root_dir + " > " + root_dir + "/" + world_dir + this->pkgname + "/world").c_str());
+
+  std::filesystem::copy_file(this->pkginfo_locale, root_dir + "/" + world_dir + this->pkgname + "/info");
+
   std::filesystem::remove_all(fakeroot_value);
-  
+
   return 0;
 }
 

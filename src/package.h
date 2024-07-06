@@ -34,7 +34,7 @@ public:
   ~Package();
 
   int makepkg(std::string& source_dir);
-  int installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir);
+  int installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir, std::string& root_dir);
   
   void run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir);
 

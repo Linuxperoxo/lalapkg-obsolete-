@@ -1,9 +1,3 @@
-//==========================================|
-//   FILE: animation.cc                     |
-//   AUTHOR: Linuxperoxo                    |
-//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
-//==========================================/
-
 #include <iostream>
 #include <chrono>
 #include <thread>
