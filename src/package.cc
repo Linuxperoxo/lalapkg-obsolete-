@@ -58,7 +58,7 @@ int Package::makepkg(std::string& source_dir){
 
   if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)) { 
 
-    std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Installing source: " GREEN + this->pkgsource + NC);
+    std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing source: " GREEN + this->pkgsource + NC);
 
     int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource + " &> /dev/null").c_str());
 
@@ -76,7 +76,7 @@ int Package::makepkg(std::string& source_dir){
 
   done = false;
 
-  std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC);
+  std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC);
 
   int result = system(("cd " + source_dir + " && tar xpvf " + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " &> /dev/null").c_str());
 
@@ -110,7 +110,7 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
   if(!check_is_file(pkgs)){
     std::atomic<bool> done = false;
 
-    std::thread animationThread(animateLoading, std::ref(done), "[" GREEN "***" NC "] " "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC);
+    std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC);
 
     int result = system(("cd $FAKEROOT && tar cvzf " + pkgs + " . &> /dev/null").c_str());
 
@@ -131,11 +131,9 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
     std::filesystem::create_directories(root_dir + "/" + world_dir + "/" + this->pkgname);
   }
 
-  std::cout << pkgs << std::endl;
-
   system(("tar xpvf " + pkgs + " -C " + root_dir + " > " + root_dir + "/" + world_dir + this->pkgname + "/world").c_str());
 
-  std::filesystem::copy_file(this->pkginfo_locale, root_dir + "/" + world_dir + this->pkgname + "/info");
+  std::filesystem::copy_file(this->pkginfo_locale, root_dir + "/" + world_dir + this->pkgname + "/info", std::filesystem::copy_options::overwrite_existing);
 
   std::filesystem::remove_all(fakeroot_value);
 

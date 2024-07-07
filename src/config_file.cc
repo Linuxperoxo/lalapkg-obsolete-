@@ -46,7 +46,7 @@ int load_config(const std::string &file, Config_file* conf_file){
     if(!var_failed.empty()){
       std::cout << RED << "|==========VAR-FAILS=========|" << NC << std::endl;
       for(const auto& failed : var_failed){
-        std::cerr << failed << "...   [ " << RED << "FAIL" << NC << " ]" << std::endl;  
+        std::cerr << RED << "| " << NC << "[" << RED << "***" << NC << "] " << failed << NC << std::endl;  
       }
       std::cout << RED << "|============================|" << NC << std::endl;
       throw std::runtime_error("Error while trying to load some var: Check config file -> " RED + file + NC);
@@ -55,7 +55,7 @@ int load_config(const std::string &file, Config_file* conf_file){
     if(!var_warning.empty()){
       std::cout << YELLOW << "|==========VAR-WARNINGS=========|" << NC << std::endl;
       for(const auto& warning : var_warning){
-        std::cerr << warning << "...    [ " << YELLOW << "WARN" << NC << " ]" << std::endl;
+        std::cerr << YELLOW << "| " << NC << "[" << YELLOW << "***" << NC << "] " << warning << std::endl;
       }
       std::cout << YELLOW << "|===============================|" << NC << std::endl;
 
