@@ -2,7 +2,7 @@
 
 /==========================================|
 |   FILE: main.cc                          |
-|   VERSION: 1.1.2a                        |
+|   VERSION: 1.1.3                         |
 |   AUTHOR: Linuxperoxo                    |
 |   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 |==========================================/
@@ -46,15 +46,20 @@
 | * Destrutor da classe Package adicionado;                           |
 | * Melhorias na eficiência do código;                                |
 | * Função get_infos adicionada                                       |
+|                                                                     |
+|1.1.3:                                                               |
+| * Correção de VÁRIOS bugs;                                          |
+| * novos .h e .cc (animation.h/.cc), (config_file.h/.cc);            |
+| * Várias funções adicionadas ao gerenciador(emerge, install, info); |
+| * Novos parâmetros adicionados (ia, iv, is). Esses são usados para  |
+|   Mostrar as informações do pacote e mostrar para o usuário;        |
+| * Limpeza do código;                                                |
 |=====================================================================|
 
-|=====================================================================|
-| TO DOS |                                                            |
-|---------                                                            |
-| * Adicionar funções na classe Package para manipulação do pacote;   |
-| * Primeiros pacotes serão adicionados ao repositorio para testar    |
-|   Funções básicas do gerenciador;                                   |
-|=====================================================================| 
+Essa versão está funcionando muito bem, várias melhorias no código foram
+adicionadas, organização no código, e alguns bugs foram resolvidos. O gerenciador 
+tem o seu primeiro pacote(neofetch), tal pacote está funcionando como esperado e isso
+é uma boa notícia. 
 
 */
 
