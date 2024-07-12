@@ -16,6 +16,6 @@ bool check_is_dir(const std::string& dir);
 
 int check_dirs(const std::string* dirs[], const std::string& warning_dir, const int num_dirs);
 
-char check_argument(char* arg[], int& num_args, char& user_arg, std::vector<std::string>& packages_vector);
+int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std::string>& packages_vector);
 
 #endif

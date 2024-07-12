@@ -5,6 +5,7 @@
 //==========================================/
 
 #include <atomic>
+#include <cctype>
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
@@ -40,6 +41,29 @@ std::string Package::get_pkgname() const{
 
 std::string Package::get_pkgversion() const{
   return this->pkgversion;
+}
+
+void Package::view_pkginfos(char info){
+  switch(tolower(info)){
+    case 'a':
+      std::cout << GREEN << "PKG_VERSION: " << NC << this->pkgversion << std::endl;
+      std::cout << GREEN << "PKG_SOURCE: " << NC << this->pkgsource << std::endl;
+      return;
+    break;
+
+    case 'v':
+      std::cout << GREEN << "PKG_VERSION: " << NC << this->pkgversion << std::endl;
+      return;
+    break;
+
+    case 's':
+      std::cout << GREEN << "PKG_SOURCE: " << NC << this->pkgsource << std::endl;
+    break;
+
+    default:
+      throw std::runtime_error("Invalid option! Use ia(all infos), iv(pkg version), is(pkg source)");
+    break;
+  }
 }
 
 void Package::run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir){

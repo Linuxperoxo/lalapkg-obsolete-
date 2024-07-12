@@ -37,6 +37,7 @@ public:
   int installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir, std::string& root_dir);
   
   void run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir);
+  void view_pkginfos(char info);
 
   std::string get_pkgname() const;
   std::string get_pkgversion() const;

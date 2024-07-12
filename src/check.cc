@@ -4,6 +4,7 @@
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
 
+#include <cstdlib>
 #include <string>
 #include <filesystem>
 #include <iostream>
@@ -47,27 +48,34 @@ int check_dirs(const std::string* dirs[], const std::string& warning_dir, const 
   return EXIT_SUCCESS;
 }
 
-char check_argument(char* arg[], int& num_args, char& user_arg, std::vector<std::string>& packages_vector){
-  int packages_founds = 0;
+int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std::string>& packages_vector){
+  user_arg[0] = '\0';
 
   for(int i = 0; i < num_args; i++){
     if(arg[i][0] == '-'){
       switch(arg[i][1]){
         case 'e':
-          user_arg = 'e';
+          user_arg[0] = 'e';
 
           while(arg[++i] != nullptr){
             packages_vector.push_back(arg[i]);
-            packages_founds++;
           }
         break;
 
         case 'u':
-          user_arg = 'u';
+          user_arg[0] = 'u';
 
           while(arg[++i] != nullptr){
             packages_vector.push_back(arg[i]);
-            packages_founds++;
+          }
+        break;
+
+        case 'i':
+         user_arg[0] = 'i';
+         user_arg[1] = arg[i][2];
+
+          if(arg[i + 1] != nullptr){
+            packages_vector.push_back(arg[++i]);
           }
         break;
 
@@ -79,15 +87,15 @@ char check_argument(char* arg[], int& num_args, char& user_arg, std::vector<std:
     }
   }
 
-  if(user_arg == '\0'){
+  if(user_arg[0] == '\0'){
     std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "argument" << NC << std::endl;
     return EXIT_FAILURE;
   }
 
-  if(packages_founds > 0){
-    return EXIT_SUCCESS;
+  if(packages_vector.empty()){
+    std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "package" << NC << std::endl;
+    return EXIT_FAILURE;
   }
 
-  std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "package" << NC << std::endl;
-  return EXIT_FAILURE;
+  return EXIT_SUCCESS;
 }

@@ -94,13 +94,13 @@ Config_file* conf_file = new Config_file;
 
 //==========================================================| FUNCTIONS
 
-int emerge(std::string pkg){
+int emergepkg(std::string pkg){
   Package* newpkg = nullptr;
 
   try{
     const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
   
-    Package* newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
+    newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
 
     const std::string pkgname = newpkg->get_pkgname();
     const std::string pkgversion = newpkg->get_pkgversion();
@@ -122,11 +122,33 @@ int emerge(std::string pkg){
   return EXIT_SUCCESS;
 }
 
-int main_switch_loop(char& user_arg){
-  switch(user_arg){
+int pkginfos(std::string pkg, char& info_arg){
+  Package* ptr_pkg = nullptr;
+  
+  try{
+    const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
+
+    ptr_pkg = new Package(pkgroot + info_file, pkgroot + build_file);
+
+    ptr_pkg->view_pkginfos(info_arg);
+
+    delete ptr_pkg;
+
+    return EXIT_SUCCESS;
+  }
+
+  catch(std::runtime_error &error){
+    std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
+    delete ptr_pkg;
+    return EXIT_FAILURE;
+  }
+}
+
+int main_switch_loop(char user_arg[]){
+  switch(user_arg[0]){
     case 'e':
       for(const auto& vector : packages_vector){
-        emerge(vector);
+        emergepkg(vector);
       }
     break;
 
@@ -134,6 +156,10 @@ int main_switch_loop(char& user_arg){
       for(const auto& vector : packages_vector){
         // unmerge
       }
+    break;
+
+    case 'i':
+      pkginfos(packages_vector[0], user_arg[1]);
     break;
   }
   return EXIT_FAILURE;
@@ -144,16 +170,15 @@ int main_switch_loop(char& user_arg){
 int main(int argc, char* argv[]){
   const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &repo_dir, &world_dir}; 
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
-  
   const std::string user_name = getenv("USER");
+  
+  char arg[3];
 
   if(user_name != "root"){
     std::cerr << RED << "ERROR: " << NC << "Are u sudo?" << std::endl;
     return EXIT_FAILURE;
   }
   
-  char arg;
-
   if(load_config(config_file, conf_file) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
