@@ -1,0 +1,35 @@
+|=====================================================================|
+| CHANGE LOG |                                                        |
+|-------------                                                        |
+|                                                                     |
+|1.1.1a:                                                              |
+| * Melhorias no código;                                              |
+| * Agora a base dos argumentos principais foram adicionados;         |
+| * Novo .h "package_operations.h";                                   |
+| * Adicionado suporte a instalação enfileirada de pacotes;           |
+|                                                                     |
+|1.1.2a:                                                              |
+| * Correção de bugs;                                                 |
+| * Novo .h "package.h";                                              |
+| * Os argumentos foram removidos no momento;                         |
+| * Novo arquivo no repositorio "Pkg-infos";                          |
+| * Função package_exist foi adaptada;                                |
+| * Classe para pacotes foi adicionado para melhor organização e      |
+|   Manipulação do pacote;                                            |
+| * Nova função adicionada em package_operations;                     |
+|                                                                     |
+|1.1.2-1a:                                                            |
+| * Correção de bugs;                                                 |
+| * Função parse_arguments melhorada;                                 |
+| * Destrutor da classe Package adicionado;                           |
+| * Melhorias na eficiência do código;                                |
+| * Função get_infos adicionada                                       |
+|                                                                     |
+|1.1.3:                                                               |
+| * Correção de VÁRIOS bugs;                                          |
+| * novos .h e .cc (animation.h/.cc), (config_file.h/.cc);            |
+| * Várias funções adicionadas ao gerenciador(emerge, install, info); |
+| * Novos parâmetros adicionados (ia, iv, is). Esses são usados para  |
+|   Mostrar as informações do pacote e mostrar para o usuário;        |
+| * Limpeza do código;                                                |
+|=====================================================================|
