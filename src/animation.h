@@ -6,5 +6,7 @@
 
 void animateLoading(std::atomic<bool>& done, std::string msg);
 
+void animateLocker();
+
 #endif 
 
