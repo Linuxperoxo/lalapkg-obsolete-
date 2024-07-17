@@ -160,7 +160,7 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
   
   system(("tar xpvf " + pkgs + " -C " + root_dir + " > " + root_dir + "/" + world_dir + this->pkgname + "/world").c_str());
 
-//  done.store(true);
+  done.store(true);
 
   animationThread.join();
 
