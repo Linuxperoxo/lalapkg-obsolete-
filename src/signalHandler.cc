@@ -10,18 +10,22 @@
 
 #include "signalHandler.h"
 
-std::string del_file; 
+std::string SignalHandler::del_file;
 
-void signalHandler(int signal){
+void SignalHandler::signalHandler(int signal){
 
-  if(SIGINT == signal){
-
-    std::filesystem::remove(del_file);
-
-  }
-
+  std::filesystem::remove(del_file);
+  
   std::cout << std::endl;
 
   exit(signal);
+
+}
+
+void SignalHandler::exitSignal(const std::string& file){
+  
+  del_file = file;
+
+  signal(SIGINT, SignalHandler::signalHandler);
 
 }

@@ -9,8 +9,18 @@
 
 #include <string>
 
-extern std::string del_file;
+class SignalHandler{
 
-void signalHandler(int signal);
+private:
+  
+  static std::string del_file;
+
+  static void signalHandler(int signal);
+
+public:
+
+  static void exitSignal(const std::string& file);
+
+};
 
 #endif
