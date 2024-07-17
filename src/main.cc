@@ -80,6 +80,8 @@ int emergepkg(std::string pkg){
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     
     std::cerr << RED << "ERROR: " << pkg << NC << " package failure!" << std::endl;
+
+    locker_obj->unlock();
     
     delete newpkg;
     
@@ -113,6 +115,8 @@ int pkginfos(std::string pkg, char& info_arg){
 
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     
+    locker_obj->unlock();
+
     delete ptr_pkg;
 
     return EXIT_FAILURE;
@@ -123,17 +127,19 @@ int pkginfos(std::string pkg, char& info_arg){
 
 int main_switch_loop(char user_arg[]){
   
-  locker_obj->lock();
-
   switch(user_arg[0]){
     
     case 'e':
       
+      locker_obj->lock();
+
       for(const auto& vector : packages_vector){
         
         emergepkg(vector);
 
       }
+
+      locker_obj->unlock();
 
     break;
 
@@ -166,12 +172,11 @@ int main(int argc, char* argv[]){
   const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &repo_dir, &world_dir}; 
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
   const std::string user_name = getenv("USER");
+  const std::string file = locker_obj->getFile();
 
   char arg[3];
 
-  del_file = locker_obj->getFile();
-
-  signal(SIGINT, signalHandler);
+  SignalHandler::exitSignal(file);
 
   if(user_name != "root"){
 
@@ -216,8 +221,6 @@ int main(int argc, char* argv[]){
     return EXIT_FAILURE;
 
   }
-
-  locker_obj->unlock();
 
   delete locker_obj;
 

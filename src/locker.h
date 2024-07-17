@@ -16,7 +16,7 @@ private:
   const std::string lockDir = "/var/lalapkg/locker/";
   const std::string lockfileName = "lockfile";
   
-  bool locked;
+  static bool locked;
 
 public:
   
