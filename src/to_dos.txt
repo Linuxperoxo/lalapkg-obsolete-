@@ -1,5 +1,0 @@
-* Organizar o código
-* Terminar função install
-* Começar função unmerge
-* Melhorar world
-
