@@ -1,3 +1,9 @@
+//==========================================|
+//   FILE: locker.h                         |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #ifndef LOCK_H
 #define LOCK_H
 
@@ -7,22 +13,22 @@ class Locker{
 
 private:
   
-  bool Locked;
-
-  const std::string lockdir = "/var/lalapkg/locker/";
+  const std::string lockDir = "/var/lalapkg/locker/";
+  const std::string lockfileName = "lockfile";
   
-  const std::string lockfile_name = "lockfile";
+  bool locked;
 
 public:
   
   Locker();
 
+  std::string getFile() const;
+
   bool is_Locked() const;
 
-  int lock_Process();
-
+  int lock();
   int unlock();
-
+  
   void waiting_Unlock();
 
 };

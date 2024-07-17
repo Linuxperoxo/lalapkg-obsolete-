@@ -1,4 +1,12 @@
+//==========================================|
+//   FILE: locker.cc                        |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #include <chrono>
+#include <csignal>
+#include <cstdlib>
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
@@ -13,45 +21,51 @@
 
 Locker::Locker(){
   
-  if(!check_is_dir(this->lockdir)){
+  if(!check_is_dir(this->lockDir)){
     
-    std::filesystem::create_directories(this->lockdir);
+    std::filesystem::create_directories(this->lockDir);
     
-    this->Locked = false;
+    this->locked = false;
     
     return;
 
   }
 
-  if(check_is_file(this->lockdir + this->lockfile_name)){
+  if(check_is_file(this->lockDir + this->lockfileName)){
     
-    this->Locked = true;
+    this->locked = true;
     
     return;
 
   }
   
-  this->Locked = false;
+  this->locked = false;
 
 }
 
 bool Locker::is_Locked() const{
   
-  return this->Locked;
+  return this->locked;
 
 }
 
-int Locker::lock_Process(){ 
+std::string Locker::getFile() const{
+
+  return this->lockDir + this->lockfileName;
+
+}
+
+int Locker::lock(){ 
   
   try{
     
-    if(!check_is_file(this->lockdir + this->lockfile_name)){
+    if(!check_is_file(this->lockDir + this->lockfileName)){
       
-      std::ofstream lockfile(this->lockdir + this->lockfile_name);
-
-      if(check_is_file(this->lockdir + this->lockfile_name)){
+      std::ofstream lockfile(this->lockDir + this->lockfileName);
+      
+      if(check_is_file(this->lockDir + this->lockfileName)){
         
-        this->Locked = true;
+        this->locked = true;
 
         return EXIT_SUCCESS;
 
@@ -75,17 +89,53 @@ int Locker::lock_Process(){
 
 }
 
-void Locker::waiting_Unlock(){
-  
-  std::atomic<bool> done = false;
+int Locker::unlock(){
 
-  std::thread animateLocker(animateLoading, std::ref(done), "Waiting to unlock");
+  if(this->locked == false){
 
-  while(check_is_file(this->lockdir + this->lockfile_name)){
-    std::this_thread::sleep_for(std::chrono::seconds(2)); 
+    return EXIT_SUCCESS;
+
+  } 
+
+  try{
+
+    std::filesystem::remove(this->lockDir + this->lockfileName);
+
+    if(check_is_file(this->lockDir + this->lockfileName)){
+
+      throw std::runtime_error("An error occurred while trying to unlock. If you are not running another lalapkg task, manually remove the file: " GREEN + this->lockDir + this->lockfileName);
+
+    }
+
+    this->locked = false;
+
+    return EXIT_SUCCESS;
+
   }
 
-  done.store(true);
+  catch(std::runtime_error &error){
+
+    std::cerr << RED "ERROR: " NC << error.what() << std::endl;
+    
+    return EXIT_FAILURE;
+
+  }
+
+}
+
+void Locker::waiting_Unlock(){
+  
+  std::atomic<bool> stop = false;
+
+  std::thread animateLocker(animateLoading, std::ref(stop), "Waiting to unlock");
+
+  while(check_is_file(this->lockDir + this->lockfileName)){
+    
+    std::this_thread::sleep_for(std::chrono::seconds(2)); 
+
+  }
+
+  stop.store(true);
 
   animateLocker.join();
 
