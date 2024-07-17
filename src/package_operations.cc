@@ -15,7 +15,6 @@
 #include "package_operations.h"
 #include "check.h"
 #include "color.h"
-#include "package.h"
 
 std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name){
   std::vector<std::string> repo_sub_dirs;
