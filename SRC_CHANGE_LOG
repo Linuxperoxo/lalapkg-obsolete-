@@ -44,7 +44,7 @@
 | * Animação foi completamente refeita;                               |
 | * Modificações no locker para deixá-lo completamente static;        |
 | * Correções de lógicas mal implementadas;                           |
-| * Correção de um pequeno bug no sync que chamava o unlock antes     |
-|   Da hora;                                                          |
+| * Correção de um pequeno bug no Locker::waiting_Unlock()            |
+|   Que chamava o unlock antes da hora;                                   |                                                        |
 | * Agora a cada ação do gerenciador uma frase random é gerada;       |                                              |
 |=====================================================================|
