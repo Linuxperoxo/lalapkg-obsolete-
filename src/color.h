@@ -1,5 +1,5 @@
 //==========================================|
-//   FILE: color.h.                         |
+//   FILE: color.h                         |
 //   AUTHOR: Linuxperoxo                    |
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
