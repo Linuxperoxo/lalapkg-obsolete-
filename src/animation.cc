@@ -18,7 +18,7 @@
 
 void animate(std::atomic<bool>& done, std::string msg, char type){
 
-  const std::string animation[] = {
+  const std::vector<std:string> animation[] = {
     
       "c o o o o o o o o o",
       "C o o o o o o o o o",
@@ -52,7 +52,7 @@ void animate(std::atomic<bool>& done, std::string msg, char type){
 
   while(!done){
 
-    for(const std::string& frames : animation){
+    for(const std::vector<string>& frames : animation){
 
       std::cout << "\r" GREEN "* " NC << phrase << NC BLUE " [" NC << frames << BLUE "]" NC;
       std::cout.flush();
