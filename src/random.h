@@ -1,3 +1,9 @@
+//==========================================|
+//   FILE: random.h                         |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #ifndef RANDOM_H
 #define RANDOM_H
 
