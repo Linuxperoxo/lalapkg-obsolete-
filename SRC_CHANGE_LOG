@@ -40,4 +40,11 @@
 | * Pequenas alterações na saída de info;                             |
 |                                                                     |
 |1.1.5:                                                               |
+| * Melhorias no código animation.cc;                                 |
+| * Animação foi completamente refeita;                               |
+| * Modificações no locker para deixá-lo completamente static;        |
+| * Correções de lógicas mal implementadas;                           |
+| * Correção de um pequeno bug no sync que chamava o unlock antes     |
+|   Da hora;                                                          |
+| * Agora a cada ação do gerenciador uma frase random é gerada;       |                                              |
 |=====================================================================|
