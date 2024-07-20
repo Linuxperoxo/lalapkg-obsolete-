@@ -34,13 +34,13 @@ void animate(std::atomic<bool>& done, std::string msg, char type){
       "----------C o o o o",
       "------------c o o o",
       "------------C o o o",
-      "--------------c o o",
-      "--------------C o o",
-      "----------------c o",
-      "----------------C o",
-      "------------------c",
-      "------------------C",
-      "-------------------"
+      "---------------c o o",
+      "---------------C o o",
+      "-----------------c o",
+      "-----------------C o",
+      "-------------------c",
+      "-------------------C",
+      "--------------------"
 
   };
   
@@ -52,7 +52,7 @@ void animate(std::atomic<bool>& done, std::string msg, char type){
 
   while(!done){
 
-    for(const std::vector<string>& frames : animation){
+    for(const std::vector<std::string>& frames : animation){
 
       std::cout << "\r" GREEN "* " NC << phrase << NC BLUE " [" NC << frames << BLUE "]" NC;
       std::cout.flush();
