@@ -38,4 +38,6 @@
 | * Criação de um lockerfile;                                         |
 | * Novos .h .cc (locker.h/.cc), (signalHandler.h/.cc);               |
 | * Pequenas alterações na saída de info;                             |
+|                                                                     |
+|1.1.5:                                                               |
 |=====================================================================|
