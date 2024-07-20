@@ -1,3 +1,9 @@
+//==========================================|
+//   FILE: random.cc                        |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #include <random>
 
 template <typename T>
