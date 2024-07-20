@@ -45,6 +45,6 @@
 | * Modificações no locker para deixá-lo completamente static;        |
 | * Correções de lógicas mal implementadas;                           |
 | * Correção de um pequeno bug no Locker::waiting_Unlock()            |
-|   Que chamava o unlock antes da hora;                                   |                                                        |
+|   Que chamava o unlock antes da hora;                               |                                                        |
 | * Agora a cada ação do gerenciador uma frase random é gerada;       |                                              |
 |=====================================================================|
