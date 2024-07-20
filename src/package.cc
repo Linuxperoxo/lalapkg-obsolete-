@@ -81,7 +81,7 @@ int Package::makepkg(std::string& source_dir){
   if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)) { 
     std::atomic<bool> done = false;
 
-    std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing source: " GREEN + this->pkgsource + NC);
+    std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing source: " GREEN + this->pkgsource + NC, 'z');
 
     int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource + " &> /dev/null").c_str());
 
@@ -99,7 +99,7 @@ int Package::makepkg(std::string& source_dir){
 
   std::atomic<bool> done = false;
 
-  std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC);
+  std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC, 'z');
 
   int result = system(("cd " + source_dir + " && tar xpvf " + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " &> /dev/null").c_str());
 
@@ -133,7 +133,7 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
   if(!check_is_file(pkgs)){
     std::atomic<bool> done = false;
 
-    std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC);
+    std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC, 'z');
 
     int result = system(("cd $FAKEROOT && tar cvzf " + pkgs + " . &> /dev/null").c_str());
 
@@ -156,11 +156,11 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
 
   std::atomic<bool> done = false;
 
-  std::thread animationThread(animateLoading, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing " GREEN + this->pkgname + "-" + this->pkgversion + NC " in "  GREEN + root_dir + NC);
+  std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing " GREEN + this->pkgname + "-" + this->pkgversion + NC " in "  GREEN + root_dir + NC, 'i');
   
   system(("tar xpvf " + pkgs + " -C " + root_dir + " > " + root_dir + "/" + world_dir + this->pkgname + "/world").c_str());
 
-  done.store(true);
+//  done.store(true);
 
   animationThread.join();
 

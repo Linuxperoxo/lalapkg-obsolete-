@@ -10,9 +10,7 @@
 #include <atomic>
 #include <string>
 
-void animateLoading(std::atomic<bool>& done, std::string msg);
-
-void animateLocker();
+void animate(std::atomic<bool> &done, std::string msg, char type = 'z');
 
 #endif 
 

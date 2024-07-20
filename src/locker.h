@@ -13,23 +13,21 @@ class Locker{
 
 private:
   
-  const std::string lockDir = "/var/lalapkg/locker/";
-  const std::string lockfileName = "lockfile";
+  static const std::string lockDir;
+  static const std::string lockfileName;
   
   static bool locked;
 
 public:
   
-  Locker();
+  static std::string getFile();
 
-  std::string getFile() const;
+  static bool is_Locked();
 
-  bool is_Locked() const;
-
-  int lock();
-  int unlock();
+  static int lock();
+  static int unlock();
   
-  void waiting_Unlock();
+  static void waiting_Unlock();
 
 };
 

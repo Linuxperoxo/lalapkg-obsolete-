@@ -1,13 +1,9 @@
-/*
-
 //==========================================|
 //   FILE: main.cc                          |
 //   VERSION: -                             |
 //   AUTHOR: Linuxperoxo                    |
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
-
-*/
 
 //==========================================================| LIBS
 
@@ -30,6 +26,7 @@
 #include "color.h"
 #include "config_file.h"
 #include "locker.h"
+#include "repo.h"
 #include "signalHandler.h"
 
 //==========================================================| CONST VARS
@@ -46,10 +43,6 @@ const std::string installbin_dir = "/tmp/lalapkg/fakeroot";
 std::vector<std::string> packages_vector;
 
 Config_file* conf_file = new Config_file;
-
-//==========================================================| Init Class Locker 
-
-Locker* locker_obj = new Locker;
 
 //==========================================================| FUNCTIONS
 
@@ -81,7 +74,7 @@ int emergepkg(std::string pkg){
     
     std::cerr << RED << "ERROR: " << pkg << NC << " package failure!" << std::endl;
 
-    locker_obj->unlock();
+    Locker::unlock();
     
     delete newpkg;
     
@@ -115,7 +108,7 @@ int pkginfos(std::string pkg, char& info_arg){
 
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     
-    locker_obj->unlock();
+    Locker::unlock();
 
     delete ptr_pkg;
 
@@ -131,7 +124,7 @@ int main_switch_loop(char user_arg[]){
     
     case 'e':
       
-      locker_obj->lock();
+      Locker::lock();
 
       for(const auto& vector : packages_vector){
         
@@ -139,7 +132,7 @@ int main_switch_loop(char user_arg[]){
 
       }
 
-      locker_obj->unlock();
+      Locker::unlock();
 
     break;
 
@@ -150,6 +143,22 @@ int main_switch_loop(char user_arg[]){
         // unmerge
         
       }
+
+    break;
+
+    case 's':
+
+      Locker::lock();
+
+      if(Repo::sync() == EXIT_FAILURE){
+
+        Locker::unlock();
+        
+        return EXIT_FAILURE;
+
+      }
+
+      Locker::unlock();
 
     break;
 
@@ -172,11 +181,9 @@ int main(int argc, char* argv[]){
   const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &repo_dir, &world_dir}; 
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
   const std::string user_name = getenv("USER");
-  const std::string file = locker_obj->getFile();
+  const std::string file = Locker::getFile();
 
   char arg[3];
-
-  SignalHandler::exitSignal(file);
 
   if(user_name != "root"){
 
@@ -186,11 +193,13 @@ int main(int argc, char* argv[]){
 
   }
   
-  if(locker_obj->is_Locked()){
+  if(Locker::is_Locked()){
 
-    locker_obj->waiting_Unlock();
+    Locker::waiting_Unlock();
 
   }
+
+  SignalHandler::exitSignal(file);
 
   if(load_config(config_file, conf_file) == EXIT_FAILURE){
 
@@ -221,8 +230,6 @@ int main(int argc, char* argv[]){
     return EXIT_FAILURE;
 
   }
-
-  delete locker_obj;
 
   return EXIT_SUCCESS;
 

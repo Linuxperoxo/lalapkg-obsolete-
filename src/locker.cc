@@ -19,39 +19,26 @@
 #include "locker.h"
 #include "color.h"
 
-Locker::Locker(){
+const std::string Locker::lockDir = "/var/lalapkg/locker/";
+const std::string Locker::lockfileName = "lockfile";
+
+bool Locker::locked = false;
+
+bool Locker::is_Locked() {
   
-  if(!check_is_dir(this->lockDir)){
-    
-    std::filesystem::create_directories(this->lockDir);
-    
-    this->locked = false;
-    
-    return;
+  if(check_is_file(lockDir + lockfileName)){
 
-  }
+    locked = true;
 
-  if(check_is_file(this->lockDir + this->lockfileName)){
-    
-    this->locked = true;
-    
-    return;
+  } 
 
-  }
-  
-  this->locked = false;
+  return locked;
 
 }
 
-bool Locker::is_Locked() const{
-  
-  return this->locked;
+std::string Locker::getFile() {
 
-}
-
-std::string Locker::getFile() const{
-
-  return this->lockDir + this->lockfileName;
+  return lockDir + lockfileName;
 
 }
 
@@ -59,13 +46,13 @@ int Locker::lock(){
   
   try{
     
-    if(!check_is_file(this->lockDir + this->lockfileName)){
+    if(!check_is_file(lockDir + lockfileName)){
       
-      std::ofstream lockfile(this->lockDir + this->lockfileName);
+      std::ofstream lockfile(lockDir + lockfileName);
       
-      if(check_is_file(this->lockDir + this->lockfileName)){
+      if(check_is_file(lockDir + lockfileName)){
         
-        this->locked = true;
+        locked = true;
 
         return EXIT_SUCCESS;
 
@@ -91,7 +78,7 @@ int Locker::lock(){
 
 int Locker::unlock(){
 
-  if(this->locked == false){
+  if(locked == false){
 
     return EXIT_SUCCESS;
 
@@ -99,15 +86,15 @@ int Locker::unlock(){
 
   try{
 
-    std::filesystem::remove(this->lockDir + this->lockfileName);
+    std::filesystem::remove(lockDir + lockfileName);
 
-    if(check_is_file(this->lockDir + this->lockfileName)){
+    if(check_is_file(lockDir + lockfileName)){
 
-      throw std::runtime_error("An error occurred while trying to unlock. If you are not running another lalapkg task, manually remove the file: " GREEN + this->lockDir + this->lockfileName);
+      throw std::runtime_error("An error occurred while trying to unlock. If you are not running another lalapkg task, manually remove the file: " GREEN + lockDir + lockfileName);
 
     }
 
-    this->locked = false;
+    locked = false;
 
     return EXIT_SUCCESS;
 
@@ -127,9 +114,9 @@ void Locker::waiting_Unlock(){
   
   std::atomic<bool> stop = false;
 
-  std::thread animateLocker(animateLoading, std::ref(stop), "Waiting to unlock");
+  std::thread animateLocker(animate, std::ref(stop), BLUE "[" GREEN "***" BLUE "] " NC " Waiting for daddy to unlock the door.", 'z');
 
-  while(check_is_file(this->lockDir + this->lockfileName)){
+  while(check_is_file(lockDir + lockfileName)){
     
     std::this_thread::sleep_for(std::chrono::seconds(2)); 
 

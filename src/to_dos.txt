@@ -1,0 +1,8 @@
+* Melhorar a função package_exist
+* Deixar o locker como funçao static
+* Melhora backup do repo
+* Organizar o main
+
+* Organizar o código
+* Começar função unmerge
+

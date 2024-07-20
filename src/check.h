@@ -13,6 +13,7 @@
 
 bool check_is_file(const std::string& file);
 bool check_is_dir(const std::string& dir);
+bool checkCommand(const std::string command);
 
 int check_dirs(const std::string* dirs[], const std::string& warning_dir, const int num_dirs);
 

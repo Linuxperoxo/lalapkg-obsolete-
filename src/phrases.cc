@@ -10,7 +10,6 @@ std::string Phrases(char type){
     "Today I just want to install packages! Stop calling me",
     "Wait baby... I install your package, and then we dance.",
     "Wait while Daddy works!",
-    "Its a Canso!",
     "I love my wife",
     "Drunk?? No, thks. I need install a package.",
     "Daddy likes UNIX-LIKE. Please wait I am installing the package.",
@@ -38,14 +37,17 @@ std::string Phrases(char type){
 
     "I smoke, if I went to eat I would eat.",
     "And here we go. Wait...",
+    "Keep it simple stupid >:)",
+    "\":3\" = :O 0====3, :===3, :3",
     "Dad is going to work, he's coming!",
     "Daddy is tired but keeps working.",
     "Did you want a daddy like me?",
+    "It's a Canso!",
     "Hey UNIX, marry me.",
     "The only road is UNIX.",
     "portage vs lalapkg, portage wins :(",
     "Here we go again. Just a moment...",
-    "Free Beer? OMG.",
+    "Free Beer? OMG. :O",
     "rpm vs lalapkg, lalapkg wins"
 
   };
