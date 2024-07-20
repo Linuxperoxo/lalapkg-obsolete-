@@ -18,7 +18,7 @@
 
 void animate(std::atomic<bool>& done, std::string msg, char type){
 
-  const std::vector<std:string> animation[] = {
+  const std::vector<std::string> animation[] = {
     
       "c o o o o o o o o o",
       "C o o o o o o o o o",
