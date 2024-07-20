@@ -1,3 +1,9 @@
+//==========================================|
+//   FILE: phrases.cc                       |
+//   AUTHOR: Linuxperoxo                    |
+//   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
+//==========================================/
+
 #include <vector>
 #include <string>
 
