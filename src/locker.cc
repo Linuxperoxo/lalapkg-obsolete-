@@ -26,6 +26,16 @@ bool Locker::locked = false;
 
 bool Locker::is_Locked() {
   
+  if(!check_is_dir(lockDir)){
+
+    std::filesystem::create_directories(lockDir);
+
+    locked = false;
+
+    return locked;
+
+  }
+
   if(check_is_file(lockDir + lockfileName)){
 
     locked = true;
@@ -112,19 +122,16 @@ int Locker::unlock(){
 
 void Locker::waiting_Unlock(){
   
-  std::atomic<bool> stop = false;
-
-  std::thread animateLocker(animate, std::ref(stop), BLUE "[" GREEN "***" BLUE "] " NC " Waiting for daddy to unlock the door.", 'z');
-
   while(check_is_file(lockDir + lockfileName)){
+    
+    std::cout << "\r" GREEN "*" NC " Waiting for daddy to unlock the door";
+    std::cout.flush();
     
     std::this_thread::sleep_for(std::chrono::seconds(2)); 
 
   }
 
-  stop.store(true);
-
-  animateLocker.join();
+  std::cout << std::endl;  
 
 }
 
