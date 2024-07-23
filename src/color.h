@@ -1,11 +1,13 @@
 //==========================================|
-//   FILE: color.h                         |
+//   FILE: color.h                          |
 //   AUTHOR: Linuxperoxo                    |
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
 
 #ifndef COLOR_H
 #define COLOR_H
+
+//==========================================================| MACROS
 
 #define RED "\033[031m"
 #define GREEN "\033[032m"
