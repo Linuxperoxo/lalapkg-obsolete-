@@ -5,15 +5,15 @@
 //==========================================/
 
 #ifndef ANIMATION_H
-#define ANIMATION_
+#define ANIMATION_H
 
 //==========================================================| LIBS
 
 #include <atomic>
 #include <string>
 
-// Declarando função 
+//==========================================================| DECLARING FUNCTIONS
+
 void animate(std::atomic<bool> &done, std::string msg, char type = 'z');
 
 #endif 
-

@@ -12,6 +12,7 @@
 #include <thread>
 #include <string>
 #include <atomic>
+#include <vector>
 
 //==========================================================| MY HEADERS
 
@@ -23,10 +24,10 @@
 
 void animate(std::atomic<bool>& done, std::string msg, char type){
 
-  const std::vector<std::string> animation[] = {
+  const std::vector<std::string> animation = {
     
       // Vetor de cada frame da animação 
-      "c o o o o o o o o o",
+      "o o o o o o o o o o",
       "C o o o o o o o o o",
       "--c o o o o o o o o",
       "--C o o o o o o o o",
@@ -40,13 +41,13 @@ void animate(std::atomic<bool>& done, std::string msg, char type){
       "----------C o o o o",
       "------------c o o o",
       "------------C o o o",
-      "---------------c o o",
-      "---------------C o o",
-      "-----------------c o",
-      "-----------------C o",
-      "-------------------c",
-      "-------------------C",
-      "--------------------"
+      "--------------c o o",
+      "--------------C o o",
+      "----------------c o",
+      "----------------C o",
+      "------------------c",
+      "------------------C",
+      "-------------------"
 
   };
   

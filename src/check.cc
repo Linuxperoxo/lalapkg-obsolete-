@@ -4,16 +4,22 @@
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
 
+//==========================================================| LIBS
+
 #include <cstdlib>
 #include <string>
 #include <filesystem>
 #include <iostream>
 #include <vector>
 
+//==========================================================| MY HEADERS
+
 #include "check.h"
 #include "color.h"
 #include "thread"
 #include "chrono"
+
+//==========================================================| FUNCTIONS
 
 bool check_is_file(const std::string& file){
   
@@ -27,44 +33,29 @@ bool check_is_dir(const std::string& dir){
 
 }
 
-int check_dirs(const std::string* dirs[], const std::string& warning_dir, const int num_dirs){
+int check_dirs(const std::string* dirs[], const int num_dirs){
 
   for(int i = 0; i < num_dirs; i++){
 
+    // verificando se o diretorio existe
     if(!check_is_dir(*dirs[i])){
 
-      if(*dirs[i] == warning_dir){
+      std::cerr << YELLOW << "WARNING: " << NC << "Directory -> " << GREEN << *dirs[i] << NC << " not found" << std::endl;
 
-        std::cerr << YELLOW << "WARNING: " << NC << "repository directory -> " << GREEN << *dirs[i] << NC << " does not exist, use" << GREEN << " lalapkg --sync" << NC << std::endl;
+      // colocando delay antes de criar o diretorio
+      std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-      } else {
+      // criando
+      std::filesystem::create_directories(*dirs[i]);  
 
-        std::cerr << YELLOW << "WARNING: " << NC << "Directory -> " << GREEN << *dirs[i] << NC << " not found" << std::endl;
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-        try{
-
-          std::filesystem::create_directories(*dirs[i]);
-
-          std::cout << ">>> Created Directory -> " << GREEN << *dirs[i] << NC << std::endl;
-
-        }
-
-        catch(std::filesystem::filesystem_error &error){
-
-          std::cerr << RED << "ERROR: " << NC << "Failed to create directory -> " << GREEN << *dirs[i] << ": " << NC << error.what() << std::endl;
-          
-          return EXIT_FAILURE;
-
-        }
-
-      }
+      std::cout << GREEN ">>> " NC "Created Directory -> " GREEN << *dirs[i] << NC << std::endl;
 
     }
 
   }
+
   return EXIT_SUCCESS;
+
 }
 
 int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std::string>& packages_vector){
@@ -80,8 +71,11 @@ int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std:
       switch(arg[i][1]){
 
         case 'e':
+
+          // passando argumento
           user_arg[0] = 'e';
 
+          // pegando os pacotes para instalar caso tenha algum
           while(arg[++i] != nullptr){
             
             packages_vector.push_back(arg[i]);
@@ -91,8 +85,11 @@ int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std:
         break;
 
         case 'u':
+
+          // passando argumento
           user_arg[0] = 'u';
 
+          // pegando os pacotes para remover caso tenha algum
           while(arg[++i] != nullptr){
             
             packages_vector.push_back(arg[i]);
@@ -103,14 +100,17 @@ int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std:
 
         case 's':
 
+          // passando argumento
           user_arg[0] = 's';
 
+          // deixando como true para não cair no if packages_vector.empty() 
           is_sync = true;
 
         break;
 
+        // case para pegar informações do pacote
         case 'i':
-         
+
           user_arg[0] = 'i';
           user_arg[1] = arg[i][2];
 
@@ -136,6 +136,7 @@ int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std:
 
   }
 
+  // caso o user não passe nenhum argumento
   if(user_arg[0] == '\0'){
     
     std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "argument" << NC << std::endl;
@@ -146,6 +147,7 @@ int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std:
 
   if(!is_sync){
 
+    // caso o user não passe nenhum pacote para ser instalado
     if(packages_vector.empty()){
       
       std::cerr << RED << "ERROR: " << NC << "U must specify some " << GREEN << "package" << NC << std::endl;
@@ -162,6 +164,7 @@ int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std:
 
 bool checkCommand(const std::string command){
 
+  // verificando se o comando existe usando o which
   return !system(("which " + command + " &> /dev/null").c_str());
 
 }
