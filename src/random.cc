@@ -4,10 +4,13 @@
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
 
+//==========================================================| LIBS
+
 #include <random>
 
-template <typename T>
+//==========================================================| FUNCTIONS
 
+template <typename T>
 T randomNum(T min, T max){
 
   std::random_device rd;
