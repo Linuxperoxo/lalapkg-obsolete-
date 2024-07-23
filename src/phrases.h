@@ -7,7 +7,11 @@
 #ifndef PHRASES_H
 #define PHRASES_H
 
+//==========================================================| LIBS
+
 #include <string>
+
+//==========================================================| DECLARING FUNCTIONS
 
 std::string Phrases(char type);
 

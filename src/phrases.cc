@@ -4,13 +4,23 @@
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
 
+// Algumas dessas frases foram retiradas de um repo
+// LINK: https://github.com/slackjeff/bananapkg 
+
+//==========================================================| LIBS
+
 #include <vector>
 #include <string>
 
+//==========================================================| MY HEADERS
+
 #include "random.h"
+
+//==========================================================| FUNCTIONS
 
 std::string Phrases(char type){
 
+  // vector das frases para instalação de pacotes
   const std::vector<std::string> phraseInstall = {
 
     "Today I just want to install packages! Stop calling me",
@@ -25,6 +35,7 @@ std::string Phrases(char type){
 
   };
 
+  // vector das frases para remoção de pacotes
   const std::vector<std::string>phraseRemove = {
 
     "Package, u accept marry me? No!? Ok, remove now! UwU MUAHAHAHAH",
@@ -38,7 +49,7 @@ std::string Phrases(char type){
 
   };
 
-
+  // vector de frases padrão
   const std::vector<std::string> phraseDefault = {
 
     "I smoke, if I went to eat I would eat.",
@@ -62,18 +73,21 @@ std::string Phrases(char type){
 
     case 'i':
 
+      // retornando frase random
       return phraseInstall[randomNum<int>(0, phraseInstall.size() - 1)];
 
     break;
 
     case 'r':
 
+      // retornando frase random
       return phraseRemove[randomNum<int>(0, phraseRemove.size() - 1)];
 
     break;
 
     default:
 
+      // retornando frase random
       return phraseDefault[randomNum<int>(0, phraseDefault.size() - 1)];
 
     break;
