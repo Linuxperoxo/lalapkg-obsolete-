@@ -46,15 +46,13 @@ Como o projeto ainda está no começo, a compilação é feita de um jeito manua
 
 1. **Clone o Repositório**:
 
-```bash
-git clone https://github.com/Linuxperoxo/lalapkg-cpp.git
-cd lalapkg-cpp
-    
+   ```sh
+    git clone https://github.com/Linuxperoxo/lalapkg-cpp.git
+    cd lalapkg-cpp
 2. **Compile o Projeto**
 
-```bash
-g++ *.cc -o lalapkg -lconfig++ -O3
-
+    ```sh
+    g++ *.cc -o lalapkg -lconfig++ -O3
 
 ### Configuração
 
@@ -65,26 +63,22 @@ Antes de usar o lalapkg, verifique se o arquivo de configuração `/etc/lala.con
 O Gerenciador suporta os seguintes parâmetros:
 
 - **Instalar um Pacote**:
-  ```bash
+  ```sh
   lalapkg -e <nome_do_pacote>
 
 - **Ver informações de um pacote**:
-  ```bash
+  ```sh
   lalapkg -i<tipo_de_info> <nome_do_pacote>
 
 - a: Todas as informações
 - v: Versão do pacote
 - s: URL do fonte do pacote
 
+
 - **Atualizar Repositório**:
 
-Por mais que o repositório não esteja aberto no momento, o comando para sincronizar o repositório é:
-
-  ```bash
-  lalapkg -s
-
-Use este comando para garantir que você tenha a versão mais recente dos pacotes disponíveis.
-
+O repositório ainda não está aberto ao público, porém você pode criar seus script. Leia o arquivo que está     em `doc/repo.doc` para obter mais informações de como criar seus script.
+  
 ## Contribuindo
 
 - **Contribuições para o lalapkg são bem-vindas! Por favor, envie problemas ou solicitações de pull via o repositório no GitHub. Certifique-se de que seu código segue o estilo existente e inclui testes apropriados.
