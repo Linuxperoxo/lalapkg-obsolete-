@@ -1,5 +1,5 @@
 //==========================================|
-//   FILÉ: main.cc                          |
+//   FILE: main.cc                          |
 //   VERSION: 1.1.5                         |
 //   AUTHOR: Linuxperoxo                    |
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
