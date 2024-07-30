@@ -1,0 +1,62 @@
+* Estrutura do Repositório
+
+O repositório padrão do lalapkg é localizado em /var/lalapkg/repo/. Este diretório funciona como o diretório 
+raiz do repositório. A estrutura dos diretórios dentro deste repositório é crucial para o gerenciamento e busca 
+de pacotes.
+
+* Diretórios de Busca
+
+Qualquer diretório criado em /var/lalapkg/repo/ será considerado um diretório de busca. Isso significa que, 
+se você criar um diretório, como ./core, o gerenciador de pacotes procurará pacotes especificados nesse diretório 
+e em todos os outros diretórios de busca.
+
+Importante: Não coloque diretórios de busca dentro de outros diretórios. Diretórios aninhados são tratados de forma diferente. Por exemplo, se você criar o diretório /var/lalapkg/repo/sys dentro de /var/lalapkg/repo/opt, o diretório sys será considerado um pacote, e o gerenciador de pacotes procurará arquivos Buildpkg e Infopkg dentro dele.
+
+* Estrutura de Diretórios de Pacote
+
+Os pacotes devem ser organizados seguindo a estrutura: /var/lalapkg/repo/<categoria>/<nome_do_pacote>/{Infopkg, Buildpkg}
+
+  *- <categoria>: Categoria do pacote (por exemplo, core, utils, etc.).
+  *- <nome_do_pacote>: Nome do pacote específico.
+
+* Infopkg
+
+O arquivo Infopkg contém informações sobre o pacote. Sua estrutura deve seguir exatamente o formato abaixo:
+
+PKGNAME="<nome_do_pacote>"
+PKGVERSION="<versao_do_pacote>"
+PKGSOURCE="<url_do_arquivo_source>"
+PKGDESC="<descricao_do_pacote>"
+PKGEXTENSION="<extensao_do_source>"
+
+Exemplo para o pacote "neofetch":
+
+PKGNAME="neofetch"
+PKGVERSION="7.1.0"
+PKGSOURCE="https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.tar.gz"
+PKGDESC="A command-line tool for Linux that displays system information in a stylish ASCII or image banner format."
+PKGEXTENSION="tar.gz"
+
+* Buildpkg
+
+O arquivo Buildpkg é um script shell que define as etapas de construção e instalação do pacote. Ele pode incluir até 
+seis funções, na seguinte ordem de prioridade:
+
+  *- pre_build
+  *- build
+  *- pos_build
+  *- pre_install
+  *- install
+  *- pos_install
+
+Pelo menos uma dessas funções deve ser incluída no arquivo.  Cada função deve ser implementada como um script shell, 
+e o arquivo será executado como root.
+
+Exemplo do arquivo Buildpkg para o pacote "neofetch":
+
+install(){
+  make DESTDIR=$FAKEROOT install
+}
+
+Nota: A variável de ambiente FAKEROOT representa o diretório onde o make install irá jogar todos os arquivos necessários
+e depois será compactado e descompactado em /.
