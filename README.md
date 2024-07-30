@@ -45,13 +45,15 @@ O Gerenciador de Pacotes lalapkg é um projeto em andamento. Embora já forneça
 Como o projeto ainda está no começo, a compilação é feita de um jeito manual:
 
 1. **Clone o Repositório**:
-  ```bash
-  git clone https://github.com/Linuxperoxo/lalapkg-cpp.git
-  cd lalapkg-cpp
+
+```bash
+git clone https://github.com/Linuxperoxo/lalapkg-cpp.git
+cd lalapkg-cpp
     
 2. **Compile o Projeto**
-  ```bash
-  g++ *.cc -o lalapkg -lconfig++ -O3
+
+```bash
+g++ *.cc -o lalapkg -lconfig++ -O3
 
 
 ### Configuração
