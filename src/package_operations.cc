@@ -131,10 +131,6 @@ int get_functions(std::vector<std::string>& build_functions, std::vector<std::st
     }
   }
 
-  if(build_functions.empty()){
-    std::cerr << YELLOW << "WARNING: " << NC << GREEN << "Build functions " << NC << "not found in -> " << GREEN << pkgscript_locale << NC << std::endl;
-  }
-
   if(install_functions.empty()){
     throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " GREEN + pkgscript_locale + NC);
   }
