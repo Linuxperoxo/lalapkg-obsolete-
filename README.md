@@ -77,7 +77,7 @@ O Gerenciador suporta os seguintes parâmetros:
 
 - **Atualizar Repositório**:
 
-O repositório ainda não está aberto ao público, porém você pode criar seus script. Leia o arquivo que está     em `doc/repo.doc` para obter mais informações de como criar seus script.
+O repositório ainda não está aberto ao público, porém você pode criar seus script. Leia o arquivo que está em `doc/repo.doc` para obter mais informações de como criar seus scripts.
   
 ## Contribuindo
 
