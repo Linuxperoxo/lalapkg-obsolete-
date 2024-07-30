@@ -31,7 +31,7 @@ O Gerenciador de Pacotes lalapkg é um projeto em andamento. Embora já forneça
 
 - **Resolução de Dependências**: Adicionar suporte para resolução automática de dependências durante a instalação de pacotes. Isso garantirá que todas as dependências necessárias sejam instaladas e gerenciadas corretamente.
 
-- - **Suporte para Parâmetros Adicionais**: Expandir a interface de linha de comando (CLI) para incluir suporte para parâmetros adicionais. Isso permitirá que os usuários especifiquem opções adicionais e flags para personalizar o comportamento do CPM, como a definição de ambientes específicos, opções de configuração avançadas e parâmetros para ajustar o processo de instalação e criação de pacotes.
+- **Suporte para Parâmetros Adicionais**: Expandir a interface de linha de comando (CLI) para incluir suporte para parâmetros adicionais. Isso permitirá que os usuários especifiquem opções adicionais e flags para personalizar o comportamento do CPM, como a definição de ambientes específicos, opções de configuração avançadas e parâmetros para ajustar o processo de instalação e criação de pacotes.
 
 -  **Documentação e Exemplos**: Expandir a documentação com exemplos de uso mais detalhados e instruções adicionais para facilitar a integração e o uso do lalapkg.
 
@@ -85,4 +85,4 @@ O repositório ainda não está aberto ao público, porém você pode criar seus
 
 ## Autor
 
-- **Linuxperoxo: https://github.com/Linuxperoxo
+- Linuxperoxo: https://github.com/Linuxperoxo
