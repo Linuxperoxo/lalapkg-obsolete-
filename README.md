@@ -2,7 +2,7 @@
 
 ## DESC
 
-O Gerenciador de Pacotes lalapkg é um sistema avançado para gerenciamento de pacotes que evoluiu de um simples script Bash para uma robusta aplicação C++. Desenvolvido para lidar com a instalação, criação e recuperação de informações sobre pacotes de software, o CPM oferece uma maneira eficiente de gerenciar pacotes em ambientes Unix-like.
+O Gerenciador de Pacotes lalapkg é um gerenciador de pacotes que evoluiu de um simples script Bash para uma robusta aplicação C++. Desenvolvido para lidar com instalação de pacotes focado no ambiente LFS, o lalapkg oferece uma maneira eficiente de gerenciar pacotes em ambientes Unix-like.
 
 ## OBS
 
