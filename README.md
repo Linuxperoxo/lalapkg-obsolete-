@@ -81,7 +81,7 @@ O repositório ainda não está aberto ao público, porém você pode criar seus
   
 ## Contribuindo
 
-- **Contribuições para o lalapkg são bem-vindas! Por favor, envie problemas ou solicitações de pull via o repositório no GitHub. Certifique-se de que seu código segue o estilo existente e inclui testes apropriados.
+- Contribuições para o lalapkg são bem-vindas! Por favor, envie problemas ou solicitações de pull via o repositório no GitHub. Certifique-se de que seu código segue o estilo existente e inclui testes apropriados.
 
 ## Autor
 
