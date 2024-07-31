@@ -52,7 +52,10 @@ Como o projeto ainda está no começo, a compilação é feita de um jeito manua
 2. **Compile o Projeto**
 
     ```sh
-    g++ *.cc -o lalapkg -lconfig++ -O3
+    make clean
+    make
+
+Agora foi pode executar o bin que está em `bin/lalapkg`
 
 ### Configuração
 
