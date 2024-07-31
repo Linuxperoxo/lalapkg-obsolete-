@@ -1,6 +1,6 @@
 //==========================================|
 //   FILE: main.cc                          |
-//   VERSION: 1.1.5                         |
+//   VERSION: -                             |
 //   AUTHOR: Linuxperoxo                    |
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
 //==========================================/
@@ -33,8 +33,6 @@
 
 const std::string config_file = "/etc/lala.conf";
 const std::string repo_dir = "/var/lalapkg/repo";
-const std::string info_file = "Infopkg";
-const std::string build_file = "Buildpkg";
 const std::string world_dir = "/var/lalapkg/world/";
 const std::string installbin_dir = "/tmp/lalapkg/fakeroot";
 
@@ -52,9 +50,9 @@ int emergepkg(std::string pkg){
 
   try{
     
-    const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
+    Package::package_exist(repo_dir, pkg);
 
-    newpkg = new Package(pkgroot + info_file, pkgroot + build_file);
+    newpkg = new Package();
 
     const std::string pkgname = newpkg->get_pkgname();
     const std::string pkgversion = newpkg->get_pkgversion();
@@ -92,9 +90,9 @@ int pkginfos(std::string pkg, char& info_arg){
   
   try{
 
-    const std::string pkgroot = package_exist(repo_dir, pkg, build_file, info_file);
+    Package::package_exist(repo_dir, pkg);
 
-    ptr_pkg = new Package(pkgroot + info_file, pkgroot + build_file);
+    ptr_pkg = new Package();
 
     ptr_pkg->view_pkginfos(info_arg);
 
@@ -178,7 +176,7 @@ int main_switch_loop(char user_arg[]){
 
 int main(int argc, char* argv[]){
   
-  const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &repo_dir, &world_dir}; 
+  const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &world_dir}; 
   const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
   const std::string user_name = getenv("USER");
   const std::string file = Locker::getFile();
@@ -213,7 +211,7 @@ int main(int argc, char* argv[]){
 
   }
   
-  if(check_dirs(check_this_dirs, repo_dir, size) == EXIT_FAILURE){
+  if(check_dirs(check_this_dirs, size) == EXIT_FAILURE){
     
     return EXIT_FAILURE;
     

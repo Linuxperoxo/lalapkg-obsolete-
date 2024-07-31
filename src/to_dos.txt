@@ -1,0 +1,8 @@
+* transferir algumas funções de package_operations* para package
+
+* Renomear package_operations para load_vars
+
+* Organizar o código
+
+* terminar comentarios config_file* adiante
+

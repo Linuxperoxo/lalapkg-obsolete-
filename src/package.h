@@ -7,8 +7,15 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
+#include <cstdlib>
+#include <filesystem>
+#include <stdexcept>
 #include <string>
 #include <vector>
+#include <iostream>
+
+#include "color.h"
+#include "check.h"
 
 class Package{
 private:
@@ -20,8 +27,12 @@ private:
   std::string pkgsource;
   std::string pkgdesc;
   std::string pkgextension;
-  std::string pkginfo_locale;
-  std::string pkgscript_locale;
+  
+  static std::string pkginfo_locale;
+  static std::string pkgscript_locale;
+
+  static const std::string build_file;
+  static const std::string info_file;
 
   //==================================| Functions vector
 
@@ -30,8 +41,11 @@ private:
 
 public:
 
-  Package(const std::string& pkginfo_locale, const std::string& pkgscript_locale);
+  Package();
+  
   ~Package();
+
+  static void package_exist(const std::string& repo, std::string& package_name);
 
   int makepkg(std::string& source_dir);
   int installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir, std::string& root_dir);

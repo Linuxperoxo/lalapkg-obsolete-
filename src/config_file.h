@@ -10,7 +10,6 @@
 #include <string>
 
 struct Config_file{
-  std::string sync;
   std::string source_dir;
   std::string pkg_dir;
   std::string root_dir;

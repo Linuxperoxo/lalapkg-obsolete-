@@ -7,46 +7,12 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
-#include <filesystem>
 #include <vector>
 #include <stdexcept>
 #include <libconfig.h++>
 
 #include "package_operations.h"
-#include "check.h"
 #include "color.h"
-
-std::string package_exist(const std::string& repo, std::string& package_name, const std::string& script_file_name, const std::string& info_file_name){
-  std::vector<std::string> repo_sub_dirs;
-
-  if(!check_is_dir(repo)){
-    throw std::runtime_error("repository directory -> " GREEN + repo + NC " does not exist, use"  GREEN " lalapkg --sync" NC);
-  }
-
-  for(const auto& sub_dirs : std::filesystem::directory_iterator(repo)){
-    if(std::filesystem::is_directory(sub_dirs)) {
-      std::string directory = sub_dirs.path().string();
-      repo_sub_dirs.push_back(directory);
-    }
-  }
-
-  for(const auto& dirs : repo_sub_dirs){
-    if(check_is_dir(dirs + "/" + package_name)){
-      if(check_is_file(dirs + "/" + package_name + "/" + script_file_name)){
-        if(check_is_file(dirs + "/" + package_name + "/" + info_file_name)){
-          return dirs + "/" + package_name + "/";
-        } else {
-          throw std::runtime_error("Info file not found in -> " GREEN + dirs + "/" + package_name + "/" + info_file_name + NC);
-        }
-      } else {
-        throw std::runtime_error("Script file not found in -> " GREEN + dirs + "/" + package_name + "/" + script_file_name + NC);
-      }
-    } else {
-      throw std::runtime_error("Package -> " GREEN + package_name + NC " not found");
-    }
-  }
-}
-
 
 int loadenv_var(std::string& common_flags, std::string& jobs, const std::string& installbin_dir){ 
   const char* var_name[] = {"CFLAGS", "CXXFLAGS", "MAKEFLAGS", "FAKEROOT"};
@@ -78,16 +44,16 @@ void unsetenv_var(){
 int get_infos(std::string* var_ptr[], std::string& pkginfo_locale){
   libconfig::Config file;
 
-  const std::string lookup_vars[] = {"PKGNAME", "PKGVERSION", "PKGSOURCE", "PKGDESC", "PKGEXTENSION"};
+  const std::vector<std::string> lookup_vars = {"PKGNAME", "PKGVERSION", "PKGSOURCE", "PKGDESC", "PKGEXTENSION"};
   
   try{
     file.readFile(pkginfo_locale);
 
-    for(int i = 0; i < sizeof(lookup_vars) / sizeof(lookup_vars[0]); i++){
+    for(int i = 0; i < lookup_vars.size(); i++){
       file.lookupValue(lookup_vars[i], *var_ptr[i]);
     }
 
-    for(int i = 0; i < sizeof(lookup_vars) / sizeof(lookup_vars[0]); i++){
+    for(int i = 0; i < lookup_vars.size(); i++){
       if(*var_ptr[i] == ""){
         throw std::runtime_error("Error while try to load var -> " GREEN + lookup_vars[i] + NC " Check info file -> " GREEN + pkginfo_locale + NC);
       }
@@ -132,8 +98,10 @@ int get_functions(std::vector<std::string>& build_functions, std::vector<std::st
   }
 
   if(install_functions.empty()){
-    throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " GREEN + pkgscript_locale + NC);
+    throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " RED + pkgscript_locale + NC);
   }
+
   return EXIT_SUCCESS;
+
 }
 

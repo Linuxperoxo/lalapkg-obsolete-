@@ -26,8 +26,8 @@ int load_config(const std::string &file, Config_file* conf_file){
     std::vector<std::string> var_warning;
     std::vector<std::string> var_failed;
 
-    std::string var_names[6] = {"sync", "source_dir", "pkg_dir", "root_dir", "common_flags", "jobs"};
-    std::string* var_pts[6] = {&conf_file->sync, &conf_file->source_dir, &conf_file->pkg_dir, &conf_file->root_dir, &conf_file->common_flags, &conf_file->jobs};
+    std::string var_names[5] = {"source_dir", "pkg_dir", "root_dir", "common_flags", "jobs"};
+    std::string* var_pts[5] = {&conf_file->source_dir, &conf_file->pkg_dir, &conf_file->root_dir, &conf_file->common_flags, &conf_file->jobs};
     
     int i = 0;
     
@@ -98,12 +98,12 @@ int load_config(const std::string &file, Config_file* conf_file){
   }
 
   catch(libconfig::ParseException &paex){
-    std::cerr << RED << "ERROR: " << NC <<  "Parse error in build file -> " << GREEN << paex.getFile() << NC << " -> " << RED << paex.getError() << NC << " -> " << "line -> " << RED << paex.getLine() << NC << std::endl;
+    std::cerr << RED "ERROR: " NC "Parse error in config file -> " GREEN << paex.getFile() << NC " -> " RED << paex.getError() << NC " line -> " << RED << paex.getLine() << NC << std::endl;
     return EXIT_FAILURE;
   }
 
    catch(libconfig::FileIOException &fioex){
-    std::cerr << RED << "ERROR: " << NC << "I/O error reading build file -> " << RED << fioex.what() << NC << std::endl;
+    std::cerr << RED "ERROR: " NC "I/O error reading config file -> " RED << file << NC << std::endl;
     return EXIT_FAILURE;
   }
 }
