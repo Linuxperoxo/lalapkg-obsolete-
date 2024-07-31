@@ -1,5 +1,6 @@
-CXX = g++
-CXXFLAGS = -Wall -O3 -march=native -Wextra -lconfig++ -std=c++17
+CXX = g++ -std=c++17 -v
+CXXFLAGS = -Wall -O3 -march=native -pipe -pedantic -Wextra
+LDFLAGS= -lconfig++
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -14,7 +15,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc
 	@mkdir -p $(OBJ_DIR)

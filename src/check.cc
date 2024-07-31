@@ -22,40 +22,28 @@
 //==========================================================| FUNCTIONS
 
 bool check_is_file(const std::string& file){
-  
   return std::filesystem::exists(file) && std::filesystem::is_regular_file(file);
-
 }
 
 bool check_is_dir(const std::string& dir){
-  
   return std::filesystem::exists(dir) && std::filesystem::is_directory(dir);
-
 }
 
-int check_dirs(const std::string* dirs[], const int num_dirs){
-
-  for(int i = 0; i < num_dirs; i++){
-
+int check_dirs(const std::vector<const std::string*> dirs){
+  for(int i = 0; i < dirs.size(); i++){
     // verificando se o diretorio existe
     if(!check_is_dir(*dirs[i])){
-
       std::cerr << YELLOW << "WARNING: " << NC << "Directory -> " << GREEN << *dirs[i] << NC << " not found" << std::endl;
 
       // colocando delay antes de criar o diretorio
       std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-      // criando
+      // Criando diretorio
       std::filesystem::create_directories(*dirs[i]);  
-
       std::cout << GREEN ">>> " NC "Created Directory -> " GREEN << *dirs[i] << NC << std::endl;
-
     }
-
   }
-
   return EXIT_SUCCESS;
-
 }
 
 int check_argument(char* arg[], int& num_args, char user_arg[], std::vector<std::string>& packages_vector){

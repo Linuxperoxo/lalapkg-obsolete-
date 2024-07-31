@@ -50,17 +50,13 @@ int emergepkg(std::string pkg){
 
   try{
     
-    Package::package_exist(repo_dir, pkg);
+    Package::packageExist(repo_dir, pkg);
 
     newpkg = new Package();
-
-    const std::string pkgname = newpkg->get_pkgname();
-    const std::string pkgversion = newpkg->get_pkgversion();
-
     newpkg->makepkg(conf_file->source_dir);
     newpkg->installpkg(world_dir, conf_file->source_dir, conf_file->pkg_dir, conf_file->root_dir);
 
-    std::filesystem::remove_all(conf_file->source_dir + "/" + pkgname + "-" + pkgversion);
+    std::filesystem::remove_all(conf_file->source_dir + "/" + newpkg->getPkgname() + "-" + newpkg->getPkgversion());
 
     delete newpkg;
 
@@ -90,11 +86,11 @@ int pkginfos(std::string pkg, char& info_arg){
   
   try{
 
-    Package::package_exist(repo_dir, pkg);
+    Package::packageExist(repo_dir, pkg);
 
     ptr_pkg = new Package();
 
-    ptr_pkg->view_pkginfos(info_arg);
+    ptr_pkg->viewPkginfos(info_arg);
 
     delete ptr_pkg;
 
@@ -176,60 +172,42 @@ int main_switch_loop(char user_arg[]){
 
 int main(int argc, char* argv[]){
   
-  const std::string* check_this_dirs[] = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &world_dir}; 
-  const size_t size = sizeof(check_this_dirs) / sizeof(check_this_dirs[0]);
+  const std::vector<const std::string*> check_this_dirs = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &world_dir}; 
   const std::string user_name = getenv("USER");
   const std::string file = Locker::getFile();
 
   char arg[3];
 
   if(user_name != "root"){
-
     std::cerr << RED << "ERROR: " << NC << "Are u sudo?" << std::endl;
-
     return EXIT_FAILURE;
-
   }
   
   if(Locker::is_Locked()){
-
     Locker::waiting_Unlock();
-
   }
 
   SignalHandler::exitSignal(file);
 
   if(load_config(config_file, conf_file) == EXIT_FAILURE){
-
     return EXIT_FAILURE;
-
   }
   
   if(loadenv_var(conf_file->common_flags, conf_file->jobs, installbin_dir) == EXIT_FAILURE){
-    
     return EXIT_FAILURE;
-
   }
   
-  if(check_dirs(check_this_dirs, size) == EXIT_FAILURE){
-    
+  if(check_dirs(check_this_dirs) == EXIT_FAILURE){
     return EXIT_FAILURE;
-    
   }
 
   if(check_argument(argv, argc, arg, packages_vector) == EXIT_FAILURE){
-    
     return EXIT_FAILURE;
-    
   }
 
   if(main_switch_loop(arg) == EXIT_FAILURE){
-    
     return EXIT_FAILURE;
-
   }
-
   return EXIT_SUCCESS;
-
 }
 

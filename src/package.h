@@ -28,6 +28,8 @@ private:
   std::string pkgdesc;
   std::string pkgextension;
   
+  bool compiled;
+  
   static std::string pkginfo_locale;
   static std::string pkgscript_locale;
 
@@ -43,18 +45,19 @@ public:
 
   Package();
   
-  ~Package();
+  ~Package() = default;
 
-  static void package_exist(const std::string& repo, std::string& package_name);
+  static void packageExist(const std::string& repo, const std::string& package_name);
 
-  int makepkg(std::string& source_dir);
-  int installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir, std::string& root_dir);
+  int makepkg(const std::string& source_dir);
+  int installpkg(const std::string& world_dir, const std::string& source_dir, const std::string& pkgs_dir, const std::string& root_dir);
+  int getFunctions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions);
   
-  void run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir);
-  void view_pkginfos(char info);
+  void runVectorFunctions(const std::vector<std::string>& vector_functions, const std::string& source_dir);
+  void viewPkginfos(char info);
 
-  std::string get_pkgname() const;
-  std::string get_pkgversion() const;
+  std::string getPkgname() const;
+  std::string getPkgversion() const;
 };
 
 #endif

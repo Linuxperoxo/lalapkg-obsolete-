@@ -25,199 +25,162 @@ const std::string Package::info_file = "Infopkg";
 std::string Package::pkginfo_locale;
 std::string Package::pkgscript_locale;
 
-Package::Package() {
-  
+Package::Package() : compiled(false) {
   std::string* var_pts[] = {&this->pkgname, &this->pkgversion, &this->pkgsource, &this->pkgdesc, &this->pkgextension};
 
   if(get_infos(var_pts, pkginfo_locale) == EXIT_FAILURE){
-
     throw std::runtime_error("");
-
   }
 
-  if(get_functions(this->build_functions, this->install_functions, pkgscript_locale)){
-
+  if(Package::getFunctions(this->build_functions, this->install_functions)){
     throw std::runtime_error("");
-
   }
-
 }
 
-Package::~Package(){
-  
-}
-
-std::string Package::get_pkgname() const{
-
+std::string Package::getPkgname() const{
   return this->pkgname;
-
 }
 
-std::string Package::get_pkgversion() const{
-
+std::string Package::getPkgversion() const{
   return this->pkgversion;
-
 }
 
-void Package::package_exist(const std::string& repo, std::string& package_name){
-
+void Package::packageExist(const std::string& repo, const std::string& package_name){
   std::vector<std::string> repo_sub_dirs;
 
   if(!check_is_dir(repo)){
-
     throw std::runtime_error("Repository directory -> " RED + repo + NC " does not exist, use " RED "lalapkg -s" NC);
-
   }
 
   for(const auto& sub_dirs : std::filesystem::directory_iterator(repo)){
-
     if(std::filesystem::is_directory(sub_dirs)){
-      
       std::string dir = sub_dirs.path().string();
-
       repo_sub_dirs.push_back(dir);
-
     }
-
   }
 
   bool found = false;
 
   for(const auto& dirs : repo_sub_dirs){
-
     if(check_is_dir(dirs + "/" + package_name)){
-
       found = true;
 
       if(!check_is_file(dirs + "/" + package_name + "/" + build_file) || !check_is_file(dirs + "/" + package_name + "/" + info_file)){
-
         throw std::runtime_error(RED + info_file + NC " or " + RED + build_file + NC " not found in -> " RED + dirs + "/" + package_name + NC);
-
       }
 
       pkginfo_locale = dirs + "/" + package_name + "/" + info_file;
       pkgscript_locale = dirs + "/" + package_name + "/" + build_file;
-
     }
-
   }
 
   if(!found){
-
     throw std::runtime_error("Package -> " RED + package_name + NC " not found");
-
   }
-
 }
 
-void Package::view_pkginfos(char info){
-
+void Package::viewPkginfos(char info){
   switch(tolower(info)){
-  
     case 'a':
-    
       std::cout << GREEN << "PKG_VERSION: " << NC << this->pkgversion << std::endl;
       std::cout << GREEN << "PKG_SOURCE: " << NC << this->pkgsource << std::endl;
-      
       return;
-
     break;
 
     case 'v':
-      
       std::cout << GREEN << "PKG_VERSION: " << NC << this->pkgversion << std::endl;
       return;
-
     break;
 
     case 's':
-      
       std::cout << GREEN << "PKG_SOURCE: " << NC << this->pkgsource << std::endl;
-
     break;
 
     default:
-
       throw std::runtime_error("Invalid option! Use ia(all infos), iv(pkg version), is(pkg source)");
-
     break;
   }
 }
 
-void Package::run_vector_functions(std::vector<std::string>& vector_functions, std::string& source_dir){
-  
-  for(const auto& functions : vector_functions){
-    
-    int result = system(("cd " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + " && source " + this->pkgscript_locale + " && " + functions).c_str());
-    
-    if(result != 0){
+int Package::getFunctions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions){
+  const std::vector<std::string> possible_build_functions = {"pre_build", "build", "pos_build"};
+  const std::vector<std::string> possible_install_functions = {"pre_install", "install", "pos_install"};
 
-      std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
-      std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
-      
-      throw std::runtime_error("Error in function -> " GREEN + functions + NC ", file -> " GREEN + this->pkgscript_locale + NC);
+  for(int i {0}; i < possible_build_functions.size(); i++){
+    if(system(("source " + this->pkgscript_locale + " && declare -f " + possible_build_functions[i] + " &> /dev/null").c_str()) == 0){
+      build_functions.push_back("source " + this->pkgscript_locale + " && " + possible_build_functions[i]);
     }
 
+    if(system(("source " + this->pkgscript_locale + " && declare -f " + possible_install_functions[i] + " &> /dev/null").c_str()) == 0){
+      install_functions.push_back("source " + pkgscript_locale + " && " + possible_install_functions[i]);
+    }
   }
 
+  if(install_functions.empty()){
+    throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " RED + pkgscript_locale + NC);
+  }
+  return EXIT_SUCCESS;
 }
 
-int Package::makepkg(std::string& source_dir){
-  
+void Package::runVectorFunctions(const std::vector<std::string>& vector_functions, const std::string& source_dir){
+  for(const auto& functions : vector_functions){
+    
+    if(system(("cd " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + " && source " + this->pkgscript_locale + " && " + functions).c_str()) != 0){ 
+      std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
+      std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
+
+      throw std::runtime_error("Error in function -> " GREEN + functions + NC);
+    }
+  }
+}
+
+int Package::makepkg(const std::string& source_dir){
   if(!check_is_file(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension)){ 
-
     std::atomic<bool> done = false;
-
-    std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing source: " GREEN + this->pkgsource + NC, 'z');
+    
+    std::thread animationDownload(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Installing source: " GREEN + this->pkgsource + NC, 'z');
 
     int result = system(("wget -O " + source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " " + this->pkgsource + " &> /dev/null").c_str());
 
     done.store(true);
 
-    animationThread.join();
+    animationDownload.join();
 
     if(result != 0){
-
       std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
-      
       throw std::runtime_error("Unable to download package source -> " GREEN + this->pkgsource + NC);
-
     }
-
-  } else {
-    
+  } else { 
     std::cout << YELLOW << ">>> " << NC << "Source is already installed! Skipping..." << std::endl; 
-
   }
 
   std::atomic<bool> done = false;
 
-  std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC, 'z');
+  std::thread animationUnpacking(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Unpacking: " GREEN + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC, 'z');
 
   int result = system(("cd " + source_dir + " && tar xpvf " + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + " &> /dev/null").c_str());
 
   done.store(true);
 
-  animationThread.join();
+  animationUnpacking.join();
 
   if(result != 0){
-    
     std::filesystem::remove(source_dir + "/" + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension);
-    
     std::filesystem::remove_all(source_dir + "/" + this->pkgname + "-" + this->pkgversion);
-    
     throw std::runtime_error("Error unpacking tarball: " RED + this->pkgname + "-" + this->pkgversion + "." + this->pkgextension + NC);
-
   }
   
-  Package::run_vector_functions(build_functions, source_dir);
+  if(!build_functions.empty()){
+    std::cout << BLUE "[" GREEN "***" BLUE "] " NC "Compiling: " GREEN << this->pkgname << "-" << this->pkgversion << NC << '\n';
 
+    Package::runVectorFunctions(build_functions, source_dir);
+
+    this->compiled = true;
+  }
   return EXIT_SUCCESS;
-
 }
 
-int Package::installpkg(const std::string& world_dir, std::string& source_dir, std::string& pkgs_dir, std::string& root_dir){
-   
+int Package::installpkg(const std::string& world_dir, const std::string& source_dir, const std::string& pkgs_dir, const std::string& root_dir){
   const char* fakeroot_var_name = "FAKEROOT";
 
   std::string fakeroot_value = getenv("FAKEROOT");
@@ -226,12 +189,11 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
   
   setenv(fakeroot_var_name,(fakeroot_value).c_str(), 1);
 
-  Package::run_vector_functions(install_functions, source_dir);
+  Package::runVectorFunctions(install_functions, source_dir);
 
   const std::string pkgs = pkgs_dir + "/" + this->pkgname + "-" + this->pkgversion + ".lala.tar.gz";
 
-  if(!check_is_file(pkgs)){
-
+  if(this->compiled || !check_is_file(pkgs)){
     std::atomic<bool> done = false;
 
     std::thread animationThread(animate, std::ref(done), BLUE "[" GREEN "***" BLUE "] " NC "Creating package: " GREEN + this->pkgname + "-" + this->pkgversion + NC, 'z');
@@ -243,25 +205,17 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
     animationThread.join();
 
     if(result != 0){
-
       throw std::runtime_error("Error creating package");
-
     } else {
-      
       std::cerr << GREEN << ">>> " << NC <<"Package created in: " << GREEN << pkgs << NC << std::endl;
-
     }
 
   } else {
-
     std::cerr << YELLOW << ">>> " << NC << "Package already exists! Skipping..." << std::endl;
-
   }
 
   if(!check_is_dir(root_dir + "/" + world_dir + "/" + this->pkgname)){
-    
     std::filesystem::create_directories(root_dir + "/" + world_dir + "/" + this->pkgname);
-
   }
 
   std::atomic<bool> done = false;
@@ -275,10 +229,8 @@ int Package::installpkg(const std::string& world_dir, std::string& source_dir, s
   animationThread.join();
 
   std::filesystem::copy_file(this->pkginfo_locale, root_dir + "/" + world_dir + this->pkgname + "/info", std::filesystem::copy_options::overwrite_existing);
-
   std::filesystem::remove_all(fakeroot_value);
 
   return 0;
-
 }
 

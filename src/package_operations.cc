@@ -77,31 +77,3 @@ int get_infos(std::string* var_ptr[], std::string& pkginfo_locale){
   }
 }
 
-int get_functions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions, std::string& pkgscript_locale){
-  std::string possible_build_functions[] = {"pre_build", "build", "pos_build"};
-  std::string possible_install_functions[] = {"pre_install", "install", "pos_install"};
-
-  int result;
-
-  for(int i = 0; i < sizeof(possible_build_functions) / sizeof(possible_build_functions[0]); i++){
-    result = system(("source " + pkgscript_locale + " && declare -f " + possible_build_functions[i] + " &> /dev/null").c_str());
-    
-    if(result == 0){
-      build_functions.push_back("source " + pkgscript_locale + " && " + possible_build_functions[i]);
-    }
-  
-    result = system(("source " + pkgscript_locale + " && declare -f " + possible_install_functions[i] + " &> /dev/null").c_str());
-
-    if(result == 0){
-      install_functions.push_back("source " + pkgscript_locale + " && " + possible_install_functions[i]);
-    }
-  }
-
-  if(install_functions.empty()){
-    throw std::runtime_error(YELLOW "Install functions " NC "not found in -> " RED + pkgscript_locale + NC);
-  }
-
-  return EXIT_SUCCESS;
-
-}
-
