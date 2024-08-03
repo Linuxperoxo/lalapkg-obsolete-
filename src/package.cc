@@ -52,7 +52,6 @@ int Package::getInfos(){
 
   const std::vector<std::string> lookup_vars = {"PKGNAME", "PKGVERSION", "PKGSOURCE", "PKGDESC", "PKGEXTENSION"};
   const std::vector<std::string*> vars_pts = {&this->pkgname, &this->pkgversion, &this->pkgsource, &this->pkgdesc, &this->pkgextension};
-
   
   file.readFile(pkginfo_locale);
 
