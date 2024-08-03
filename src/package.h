@@ -41,6 +41,9 @@ private:
   std::vector<std::string> build_functions;
   std::vector<std::string> install_functions;
 
+  int getFunctions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions);
+  int getInfos();
+
 public:
 
   Package();
@@ -51,13 +54,13 @@ public:
 
   int makepkg(const std::string& source_dir);
   int installpkg(const std::string& world_dir, const std::string& source_dir, const std::string& pkgs_dir, const std::string& root_dir);
-  int getFunctions(std::vector<std::string>& build_functions, std::vector<std::string>& install_functions);
-  
+
   void runVectorFunctions(const std::vector<std::string>& vector_functions, const std::string& source_dir);
   void viewPkginfos(char info);
 
   std::string getPkgname() const;
   std::string getPkgversion() const;
+  std::string getPkgInfoFile() const;
 };
 
 #endif

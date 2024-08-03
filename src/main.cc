@@ -1,5 +1,5 @@
 //==========================================|
-//   FILE: main.cc                          |
+//   FILE: main.cc             ''             |
 //   VERSION: -                             |
 //   AUTHOR: Linuxperoxo                    |
 //   COPYRIGHT: (c) 2024 per Linuxperoxo.   |
@@ -9,7 +9,6 @@
 
 #include <cctype>
 #include <csignal>
-#include <cstddef>
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -21,11 +20,11 @@
 //==========================================================| MY HEADERS
 
 #include "check.h"
-#include "package_operations.h"
 #include "package.h"
 #include "color.h"
 #include "config_file.h"
 #include "locker.h"
+#include "env_var.h"
 #include "repo.h"
 #include "signalHandler.h"
 
@@ -45,11 +44,9 @@ Config_file* conf_file = new Config_file;
 //==========================================================| FUNCTIONS
 
 int emergepkg(std::string pkg){
-  
   Package* newpkg = nullptr;
 
   try{
-    
     Package::packageExist(repo_dir, pkg);
 
     newpkg = new Package();
@@ -60,32 +57,31 @@ int emergepkg(std::string pkg){
 
     delete newpkg;
 
+    return EXIT_SUCCESS;
   }
 
   catch(std::runtime_error &error){
-    
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     
     std::cerr << RED << "ERROR: " << pkg << NC << " package failure!" << std::endl;
-
-    Locker::unlock();
-    
-    delete newpkg;
-    
-    return EXIT_FAILURE;
-
   }
-  
-  return EXIT_SUCCESS;
 
+  catch(libconfig::FileIOException& fioex){
+    std::cerr << RED "ERROR: " NC << "I/O error reading info file -> " RED << newpkg->getPkgInfoFile() << ' ' << fioex.what() << NC << '\n';
+  }
+
+  catch(libconfig::ParseException& paex){
+    std::cerr << RED "ERROR: " NC << "Parser error in info file ->  " RED << paex.getFile() << NC "! ERROR -> " RED << paex.what() << ' ' << paex.getError() << NC << '\n';
+  }
+
+  delete newpkg;
+  return EXIT_FAILURE;
 }
 
 int pkginfos(std::string pkg, char& info_arg){
-  
   Package* ptr_pkg = nullptr;
   
   try{
-
     Package::packageExist(repo_dir, pkg);
 
     ptr_pkg = new Package();
@@ -95,11 +91,9 @@ int pkginfos(std::string pkg, char& info_arg){
     delete ptr_pkg;
 
     return EXIT_SUCCESS;
-
   }
 
   catch(std::runtime_error &error){
-
     std::cerr << RED << "ERROR: " << NC << error.what() << std::endl;
     
     Locker::unlock();
@@ -107,75 +101,49 @@ int pkginfos(std::string pkg, char& info_arg){
     delete ptr_pkg;
 
     return EXIT_FAILURE;
-
   }
-
 }
 
 int main_switch_loop(char user_arg[]){
-  
   switch(user_arg[0]){
-    
     case 'e':
-      
       Locker::lock();
 
       for(const auto& vector : packages_vector){
-        
         emergepkg(vector);
-
       }
-
-      Locker::unlock();
-
+      return EXIT_SUCCESS;
     break;
 
     case 'u':
-
       for(const auto& vector : packages_vector){
-
         // unmerge
-        
       }
-
     break;
 
     case 's':
-
       Locker::lock();
 
       if(Repo::sync() == EXIT_FAILURE){
-
-        Locker::unlock();
-        
         return EXIT_FAILURE;
-
       }
-
-      Locker::unlock();
-
+      return EXIT_SUCCESS;
     break;
 
     case 'i':
-
       pkginfos(packages_vector[0], user_arg[1]);
-
+      return EXIT_SUCCESS;
     break;
-
   }
-
-  return EXIT_FAILURE;
-
 }
 
 //==========================================================| MAIN
 
-int main(int argc, char* argv[]){
-  
+int main(int argc, char* argv[]){  
   const std::vector<const std::string*> check_this_dirs = {&conf_file->source_dir, &conf_file->root_dir, &conf_file->pkg_dir, &installbin_dir, &world_dir}; 
   const std::string user_name = getenv("USER");
   const std::string file = Locker::getFile();
-
+  
   char arg[3];
 
   if(user_name != "root"){
@@ -192,11 +160,13 @@ int main(int argc, char* argv[]){
   if(load_config(config_file, conf_file) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
+
+  Env* env = new Env(conf_file->common_flags, conf_file->common_flags, conf_file->jobs, installbin_dir);
   
-  if(loadenv_var(conf_file->common_flags, conf_file->jobs, installbin_dir) == EXIT_FAILURE){
+  if(env->_loadenv_() == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
-  
+
   if(check_dirs(check_this_dirs) == EXIT_FAILURE){
     return EXIT_FAILURE;
   }
@@ -206,8 +176,16 @@ int main(int argc, char* argv[]){
   }
 
   if(main_switch_loop(arg) == EXIT_FAILURE){
+    delete env;
+    delete conf_file;
+    Locker::unlock();
     return EXIT_FAILURE;
   }
+
+  delete env;
+  delete conf_file;
+  Locker::unlock();
+
   return EXIT_SUCCESS;
 }
 

@@ -12,10 +12,10 @@
 #include <string>
 #include <thread>
 #include <filesystem>
+#include <libconfig.h++>
 
 #include "package.h"
 #include "check.h"
-#include "package_operations.h"
 #include "animation.h"
 #include "color.h"
 
@@ -26,9 +26,7 @@ std::string Package::pkginfo_locale;
 std::string Package::pkgscript_locale;
 
 Package::Package() : compiled(false) {
-  std::string* var_pts[] = {&this->pkgname, &this->pkgversion, &this->pkgsource, &this->pkgdesc, &this->pkgextension};
-
-  if(get_infos(var_pts, pkginfo_locale) == EXIT_FAILURE){
+  if(getInfos() == EXIT_FAILURE){
     throw std::runtime_error("");
   }
 
@@ -37,12 +35,40 @@ Package::Package() : compiled(false) {
   }
 }
 
+std::string Package::getPkgInfoFile() const{
+  return this->pkginfo_locale;
+}
+
 std::string Package::getPkgname() const{
   return this->pkgname;
 }
 
 std::string Package::getPkgversion() const{
   return this->pkgversion;
+}
+
+int Package::getInfos(){
+  libconfig::Config file;
+
+  const std::vector<std::string> lookup_vars = {"PKGNAME", "PKGVERSION", "PKGSOURCE", "PKGDESC", "PKGEXTENSION"};
+  const std::vector<std::string*> vars_pts = {&this->pkgname, &this->pkgversion, &this->pkgsource, &this->pkgdesc, &this->pkgextension};
+
+  
+  file.readFile(pkginfo_locale);
+
+  for(int i = 0; i < lookup_vars.size(); i++){
+    file.lookupValue(lookup_vars[i], *vars_pts[i]);
+  }
+
+  unsigned int index = 0;
+
+  for(const auto& vars : vars_pts){
+    if(*vars == ""){
+      throw std::runtime_error("Error while try to load var -> " RED + lookup_vars[index] + NC "! Check info file -> " RED + pkginfo_locale + NC);
+    }
+    index++;
+  }
+  return EXIT_SUCCESS;
 }
 
 void Package::packageExist(const std::string& repo, const std::string& package_name){
@@ -224,13 +250,13 @@ int Package::installpkg(const std::string& world_dir, const std::string& source_
   
   system(("tar xpvf " + pkgs + " -C " + root_dir + " > " + root_dir + "/" + world_dir + this->pkgname + "/world").c_str());
 
-//  done.store(true);
+  done.store(true);
 
   animationThread.join();
 
   std::filesystem::copy_file(this->pkginfo_locale, root_dir + "/" + world_dir + this->pkgname + "/info", std::filesystem::copy_options::overwrite_existing);
   std::filesystem::remove_all(fakeroot_value);
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
