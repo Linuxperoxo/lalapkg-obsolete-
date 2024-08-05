@@ -26,18 +26,18 @@ int load_config(const std::string &file, Config_file* conf_file){
     std::vector<std::string> var_warning;
     std::vector<std::string> var_failed;
 
-    std::string var_names[5] = {"source_dir", "pkg_dir", "root_dir", "common_flags", "jobs"};
-    std::string* var_pts[5] = {&conf_file->source_dir, &conf_file->pkg_dir, &conf_file->root_dir, &conf_file->common_flags, &conf_file->jobs};
+    std::vector<std::string> var_names = {"source_dir", "pkg_dir", "root_dir", "common_flags", "jobs"};
+    std::vector<std::string*> var_pts = {&conf_file->source_dir, &conf_file->pkg_dir, &conf_file->root_dir, &conf_file->common_flags, &conf_file->jobs};
     
     int i = 0;
     
-    for(const auto& names : var_names){
-      conf_obj.lookupValue(names, *var_pts[i]);
+    for(size_t i = 0; i < var_names.size(); i++){
+      conf_obj.lookupValue(var_names[i], *var_pts[i]);
       if(var_pts[i]->empty()){
-        if(names == "common_flags" || names == "jobs"){
-          var_warning.push_back(names);
+        if(var_names[i] == "common_flags" || var_names[i] == "jobs"){
+          var_warning.push_back(var_names[i]);
         } else {
-          var_failed.push_back(names);
+          var_failed.push_back(var_names[i]);
         }
       }
       i++;
